@@ -16,9 +16,6 @@ export async function GET(request: Request) {
   const segmentParsed = segmentRaw ? Segment.safeParse(segmentRaw) : null;
   const statusParsed = statusRaw ? LeadStatus.safeParse(statusRaw) : null;
 
-  if (segmentRaw && segmentParsed && !segmentParsed.success) {
-    return NextResponse.json({ error: "Некорректный segment" }, { status: 400 });
-  }
   if (statusRaw && statusParsed && !statusParsed.success) {
     return NextResponse.json({ error: "Некорректный status" }, { status: 400 });
   }

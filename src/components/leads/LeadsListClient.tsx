@@ -2,17 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import type { LeadRow as LeadRowType } from "@/lib/schemas";
-import {
-  LEAD_STATUSES,
-  LEAD_STATUS_LABELS_RU,
-  SEGMENTS,
-  SEGMENT_LABELS_RU,
-} from "@/lib/schemas";
+import type { LeadRow as LeadRowType, SegmentRow } from "@/lib/schemas";
+import { LEAD_STATUSES, LEAD_STATUS_LABELS_RU } from "@/lib/schemas";
 import { LeadRow } from "./LeadRow";
 import { EmptyState } from "@/components/EmptyState";
 
-export function LeadsListClient() {
+export function LeadsListClient({ segments }: { segments: SegmentRow[] }) {
   const [leads, setLeads] = useState<LeadRowType[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [segment, setSegment] = useState<string>("");
@@ -77,9 +72,9 @@ export function LeadsListClient() {
             className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm bg-white"
           >
             <option value="">Все</option>
-            {SEGMENTS.map((s) => (
-              <option key={s} value={s}>
-                {SEGMENT_LABELS_RU[s]}
+            {segments.map((s) => (
+              <option key={s.slug} value={s.slug}>
+                {s.label_ru}
               </option>
             ))}
           </select>
@@ -140,7 +135,6 @@ export function LeadsListClient() {
           <table className="min-w-full text-left">
             <thead className="bg-zinc-50">
               <tr className="text-xs uppercase tracking-wide text-zinc-600">
-                <th className="px-3 py-2 font-medium">Имя</th>
                 <th className="px-3 py-2 font-medium">Компания</th>
                 <th className="px-3 py-2 font-medium">Сегмент</th>
                 <th className="px-3 py-2 font-medium">Статус</th>
@@ -150,7 +144,7 @@ export function LeadsListClient() {
             </thead>
             <tbody>
               {leads.map((lead) => (
-                <LeadRow key={lead.id} lead={lead} />
+                <LeadRow key={lead.id} lead={lead} segments={segments} />
               ))}
             </tbody>
           </table>

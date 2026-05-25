@@ -1,6 +1,6 @@
 import Link from "next/link";
-import type { LeadRow } from "@/lib/schemas";
-import { SEGMENT_LABELS_RU, LEAD_STATUS_LABELS_RU } from "@/lib/schemas";
+import type { LeadRow, SegmentRow } from "@/lib/schemas";
+import { LEAD_STATUS_LABELS_RU } from "@/lib/schemas";
 import type { NextAction } from "@/lib/pipeline/getNextAction";
 
 const URGENCY_BADGE: Record<string, string> = {
@@ -18,12 +18,20 @@ function urgencyLabel(u: NextAction["urgency"]): string {
   return "";
 }
 
+function resolveSegmentLabel(slug: string, segments?: SegmentRow[]): string {
+  if (!segments) return slug;
+  const row = segments.find((s) => s.slug === slug);
+  return row ? row.label_ru : slug;
+}
+
 export function TodayCard({
   lead,
   nextAction,
+  segments,
 }: {
   lead: LeadRow;
   nextAction: NextAction;
+  segments?: SegmentRow[];
 }) {
   const urgencyClass =
     nextAction.urgency && URGENCY_BADGE[nextAction.urgency]
@@ -37,8 +45,10 @@ export function TodayCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="font-medium text-zinc-900 truncate">{lead.name}</div>
-          <div className="text-sm text-zinc-600 truncate">{lead.company}</div>
+          <div className="font-medium text-zinc-900 truncate">{lead.company}</div>
+          {lead.name ? (
+            <div className="text-xs text-zinc-500 truncate">{lead.name}</div>
+          ) : null}
         </div>
         {nextAction.urgency ? (
           <span
@@ -50,7 +60,7 @@ export function TodayCard({
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-zinc-600">
         <span className="px-2 py-0.5 rounded bg-zinc-100 border border-zinc-200">
-          {SEGMENT_LABELS_RU[lead.segment]}
+          {resolveSegmentLabel(lead.segment, segments)}
         </span>
         <span className="px-2 py-0.5 rounded bg-zinc-50 border border-zinc-200">
           {LEAD_STATUS_LABELS_RU[lead.status]}

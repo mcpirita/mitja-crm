@@ -9,7 +9,7 @@ const optionalTrimmed = z
   .optional();
 
 export const LeadCreate = z.object({
-  name: z.string().trim().min(1, "Имя обязательно"),
+  name: z.string().trim().optional().default(""),
   company: z.string().trim().min(1, "Компания обязательна"),
   email: z.string().trim().email("Некорректный email").nullable().optional(),
   website: optionalTrimmed,
@@ -37,6 +37,7 @@ export const LeadRow = z.object({
   status: LeadStatus,
   hook_text: z.string().nullable(),
   notes: z.string().nullable(),
+  last_status_raw: z.string().nullable(),
   next_action_due: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),

@@ -3,10 +3,9 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
-  SEGMENT_LABELS_RU,
-  SEGMENT_WITH_ANY,
   TEMPLATE_KINDS,
   TEMPLATE_KIND_LABELS_RU,
+  type SegmentRow,
   type SegmentWithAny,
   type TemplateKind,
 } from "@/lib/schemas";
@@ -22,11 +21,6 @@ export type TemplateFormValues = {
   body: string;
 };
 
-const SEGMENT_LABEL_WITH_ANY: Record<SegmentWithAny, string> = {
-  ...SEGMENT_LABELS_RU,
-  any: "Любой (универсальный)",
-};
-
 const DEFAULT_VALUES: TemplateFormValues = {
   name: "",
   segment: "any",
@@ -39,10 +33,12 @@ export function TemplateForm({
   mode,
   initial,
   templateId,
+  segments,
 }: {
   mode: Mode;
   initial?: Partial<TemplateFormValues>;
   templateId?: number;
+  segments: SegmentRow[];
 }) {
   const router = useRouter();
   const [values, setValues] = useState<TemplateFormValues>({
@@ -52,6 +48,11 @@ export function TemplateForm({
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const activeSegments = segments.filter((s) => s.is_archived === 0);
+  const knownSlugs = new Set<string>(["any", ...segments.map((s) => s.slug)]);
+  const showStaleSegment =
+    values.segment !== "any" && !knownSlugs.has(values.segment);
 
   function update<K extends keyof TemplateFormValues>(
     key: K,
@@ -168,9 +169,15 @@ export function TemplateForm({
                 }
                 className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-900 focus:outline-none"
               >
-                {SEGMENT_WITH_ANY.map((s) => (
-                  <option key={s} value={s}>
-                    {SEGMENT_LABEL_WITH_ANY[s]}
+                {showStaleSegment ? (
+                  <option value={values.segment}>
+                    {values.segment} (текущий)
+                  </option>
+                ) : null}
+                <option value="any">Любой (универсальный)</option>
+                {activeSegments.map((s) => (
+                  <option key={s.slug} value={s.slug}>
+                    {s.label_ru}
                   </option>
                 ))}
               </select>

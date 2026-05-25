@@ -1,4 +1,4 @@
-import type { LeadRow } from "@/lib/schemas";
+import type { LeadRow, SegmentRow } from "@/lib/schemas";
 import type { NextAction, NextActionKind } from "@/lib/pipeline/getNextAction";
 import { TodayCard } from "./TodayCard";
 
@@ -29,10 +29,12 @@ export function TodayGroup({
   title,
   items,
   emptyHint,
+  segments,
 }: {
   title: string;
   items: TodayItem[];
   emptyHint?: string;
+  segments: SegmentRow[];
 }) {
   if (items.length === 0) {
     return (
@@ -81,6 +83,7 @@ export function TodayGroup({
                     key={it.lead.id}
                     lead={it.lead}
                     nextAction={it.next_action}
+                    segments={segments}
                   />
                 ))}
               </div>

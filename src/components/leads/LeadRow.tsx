@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { LeadRow as LeadRowType } from "@/lib/schemas";
+import type { LeadRow as LeadRowType, SegmentRow } from "@/lib/schemas";
 import { SegmentBadge } from "./SegmentBadge";
 import { StatusBadge } from "./StatusBadge";
 
@@ -13,7 +13,23 @@ function formatDate(value: string): string {
   });
 }
 
-export function LeadRow({ lead }: { lead: LeadRowType }) {
+function resolveSegment(
+  slug: string,
+  segments: SegmentRow[],
+): { label: string; color: string } {
+  const row = segments.find((s) => s.slug === slug);
+  if (row) return { label: row.label_ru, color: row.color };
+  return { label: slug, color: "zinc" };
+}
+
+export function LeadRow({
+  lead,
+  segments,
+}: {
+  lead: LeadRowType;
+  segments: SegmentRow[];
+}) {
+  const seg = resolveSegment(lead.segment, segments);
   return (
     <tr className="border-b border-zinc-200 hover:bg-zinc-50">
       <td className="px-3 py-2 align-middle">
@@ -21,12 +37,14 @@ export function LeadRow({ lead }: { lead: LeadRowType }) {
           href={`/leads/${lead.id}`}
           className="font-medium text-zinc-900 hover:underline"
         >
-          {lead.name}
+          {lead.company}
         </Link>
+        {lead.name ? (
+          <div className="text-xs text-zinc-500 mt-0.5">{lead.name}</div>
+        ) : null}
       </td>
-      <td className="px-3 py-2 align-middle text-sm text-zinc-700">{lead.company}</td>
       <td className="px-3 py-2 align-middle">
-        <SegmentBadge segment={lead.segment} />
+        <SegmentBadge label={seg.label} color={seg.color} />
       </td>
       <td className="px-3 py-2 align-middle">
         <StatusBadge status={lead.status} />

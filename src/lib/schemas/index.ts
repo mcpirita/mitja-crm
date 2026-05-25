@@ -3,3 +3,5 @@ export * from "./lead";
 export * from "./event";
 export * from "./template";
 export * from "./settings";
+export * from "./space";
+export * from "./segment";

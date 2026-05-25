@@ -3,18 +3,30 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { LeadRow, OutreachEventRow } from "@/lib/schemas";
+import type { LeadRow, OutreachEventRow, SegmentRow } from "@/lib/schemas";
 import { SegmentBadge } from "./SegmentBadge";
 import { StatusBadge } from "./StatusBadge";
 import { EventTimeline } from "./EventTimeline";
 import { StatusQuickButtons } from "./StatusQuickButtons";
 import { EmailGenerator } from "./EmailGenerator";
+import { LeadEditForm } from "./LeadEditForm";
+import { LeadSpacesSection } from "./LeadSpacesSection";
 
 interface Props {
   id: number;
+  segments: SegmentRow[];
 }
 
-export function LeadDetail({ id }: Props) {
+function resolveSegment(
+  slug: string,
+  segments: SegmentRow[],
+): { label: string; color: string } {
+  const row = segments.find((s) => s.slug === slug);
+  if (row) return { label: row.label_ru, color: row.color };
+  return { label: slug, color: "zinc" };
+}
+
+export function LeadDetail({ id, segments }: Props) {
   const router = useRouter();
   const [lead, setLead] = useState<LeadRow | null>(null);
   const [events, setEvents] = useState<OutreachEventRow[]>([]);
@@ -31,6 +43,7 @@ export function LeadDetail({ id }: Props) {
   const [notesSaved, setNotesSaved] = useState(false);
 
   const [deleting, setDeleting] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -167,62 +180,87 @@ export function LeadDetail({ id }: Props) {
       ) : null}
 
       <section className="rounded-lg border border-zinc-200 bg-white p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-semibold text-zinc-900">{lead.name}</h2>
-            <div className="text-sm text-zinc-600">{lead.company}</div>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <SegmentBadge segment={lead.segment} />
-            <StatusBadge status={lead.status} />
-          </div>
-        </div>
+        {editing ? (
+          <LeadEditForm
+            lead={lead}
+            onSaved={(updated) => {
+              setLead(updated);
+              setEditing(false);
+            }}
+            onCancel={() => setEditing(false)}
+          />
+        ) : (
+          <>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-semibold text-zinc-900">{lead.company}</h2>
+                {lead.name ? (
+                  <div className="text-sm text-zinc-500">{lead.name}</div>
+                ) : null}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <SegmentBadge
+                  label={resolveSegment(lead.segment, segments).label}
+                  color={resolveSegment(lead.segment, segments).color}
+                />
+                <StatusBadge status={lead.status} />
+                <button
+                  type="button"
+                  onClick={() => setEditing(true)}
+                  className="rounded-md border border-zinc-300 bg-white px-3 py-1 text-xs text-zinc-700 hover:bg-zinc-100"
+                >
+                  Редактировать
+                </button>
+              </div>
+            </div>
 
-        <dl className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
-          <div>
-            <dt className="text-zinc-500">Email</dt>
-            <dd className="text-zinc-900">
-              {lead.email ? (
-                <a
-                  href={`mailto:${lead.email}`}
-                  className="text-blue-600 hover:underline"
-                >
-                  {lead.email}
-                </a>
-              ) : (
-                <span className="text-zinc-400">—</span>
-              )}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-zinc-500">Сайт</dt>
-            <dd className="text-zinc-900">
-              {lead.website ? (
-                <a
-                  href={lead.website.startsWith("http") ? lead.website : `https://${lead.website}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  {lead.website}
-                </a>
-              ) : (
-                <span className="text-zinc-400">—</span>
-              )}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-zinc-500">Страна / Город</dt>
-            <dd className="text-zinc-900">
-              {lead.country}
-              {lead.city ? `, ${lead.city}` : ""}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-zinc-500">Источник</dt>
-            <dd className="text-zinc-900">{lead.source}</dd>
-          </div>
-        </dl>
+            <dl className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+              <div>
+                <dt className="text-zinc-500">Email</dt>
+                <dd className="text-zinc-900">
+                  {lead.email ? (
+                    <a
+                      href={`mailto:${lead.email}`}
+                      className="text-blue-600 hover:underline"
+                    >
+                      {lead.email}
+                    </a>
+                  ) : (
+                    <span className="text-zinc-400">—</span>
+                  )}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-zinc-500">Сайт</dt>
+                <dd className="text-zinc-900">
+                  {lead.website ? (
+                    <a
+                      href={lead.website.startsWith("http") ? lead.website : `https://${lead.website}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      {lead.website}
+                    </a>
+                  ) : (
+                    <span className="text-zinc-400">—</span>
+                  )}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-zinc-500">Страна / Город</dt>
+                <dd className="text-zinc-900">
+                  {lead.country}
+                  {lead.city ? `, ${lead.city}` : ""}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-zinc-500">Источник</dt>
+                <dd className="text-zinc-900">{lead.source}</dd>
+              </div>
+            </dl>
+          </>
+        )}
       </section>
 
       <section className="rounded-lg border border-zinc-200 bg-white p-6">
@@ -249,6 +287,11 @@ export function LeadDetail({ id }: Props) {
             <span className="text-sm text-emerald-700">Сохранено</span>
           ) : null}
         </div>
+      </section>
+
+      <section className="rounded-lg border border-zinc-200 bg-white p-6">
+        <h3 className="text-sm font-semibold text-zinc-900 mb-3">Предлагаемые помещения</h3>
+        <LeadSpacesSection leadId={id} />
       </section>
 
       <section className="rounded-lg border border-zinc-200 bg-white p-6">

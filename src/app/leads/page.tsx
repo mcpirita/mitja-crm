@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { LeadsListClient } from "@/components/leads/LeadsListClient";
+import { listSegments } from "@/lib/db/segments";
 
 export const metadata = {
   title: "Лиды · Mitja CRM",
 };
 
-export default function LeadsPage() {
+export const dynamic = "force-dynamic";
+
+export default async function LeadsPage() {
+  const segments = await listSegments();
   return (
     <>
       <PageHeader
@@ -21,7 +25,7 @@ export default function LeadsPage() {
           </Link>
         }
       />
-      <LeadsListClient />
+      <LeadsListClient segments={segments} />
     </>
   );
 }

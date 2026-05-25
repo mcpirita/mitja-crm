@@ -19,13 +19,9 @@ export async function GET(request: Request) {
 
   if (segmentRaw) {
     const parsed = SegmentWithAny.safeParse(segmentRaw);
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Некорректное значение segment" },
-        { status: 400 },
-      );
+    if (parsed.success) {
+      filters.segment = parsed.data;
     }
-    filters.segment = parsed.data;
   }
 
   if (kindRaw) {

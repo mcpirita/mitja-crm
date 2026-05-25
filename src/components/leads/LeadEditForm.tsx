@@ -21,7 +21,13 @@ const SOURCE_LABELS_RU: Record<(typeof SOURCES)[number], string> = {
   other: "Другое",
 };
 
-export function LeadCreateForm() {
+interface Props {
+  lead: LeadRow;
+  onSaved: (updated: LeadRow) => void;
+  onCancel: () => void;
+}
+
+export function LeadEditForm({ lead, onSaved, onCancel }: Props) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +37,7 @@ export function LeadCreateForm() {
   const [segmentsError, setSegmentsError] = useState<string | null>(null);
 
   const [showNewSegment, setShowNewSegment] = useState(false);
-  const [previousSegment, setPreviousSegment] = useState<string>("");
+  const [previousSegment, setPreviousSegment] = useState<string>(lead.segment);
   const [newSegmentLabel, setNewSegmentLabel] = useState("");
   const [newSegmentColor, setNewSegmentColor] = useState<SegmentColor>(
     SEGMENT_COLOR_PALETTE[0],
@@ -40,17 +46,15 @@ export function LeadCreateForm() {
   const [newSegmentError, setNewSegmentError] = useState<string | null>(null);
 
   const [form, setForm] = useState({
-    name: "",
-    company: "",
-    email: "",
-    website: "",
-    country: "DE",
-    city: "",
-    segment: "" as string,
-    source: "other" as (typeof SOURCES)[number],
-    status: "new" as (typeof LEAD_STATUSES)[number],
-    hook_text: "",
-    notes: "",
+    name: lead.name,
+    company: lead.company,
+    email: lead.email ?? "",
+    website: lead.website ?? "",
+    country: lead.country,
+    city: lead.city ?? "",
+    segment: lead.segment as string,
+    source: lead.source,
+    status: lead.status,
   });
 
   useEffect(() => {
@@ -63,12 +67,6 @@ export function LeadCreateForm() {
         if (!cancelled) {
           setSegments(data);
           setSegmentsLoading(false);
-          const firstActive = data.find((s) => s.is_archived === 0);
-          setForm((prev) =>
-            prev.segment === ""
-              ? { ...prev, segment: firstActive?.slug ?? "other" }
-              : prev,
-          );
         }
       } catch (err) {
         if (!cancelled) {
@@ -76,9 +74,6 @@ export function LeadCreateForm() {
             err instanceof Error ? err.message : "Ошибка загрузки сегментов",
           );
           setSegmentsLoading(false);
-          setForm((prev) =>
-            prev.segment === "" ? { ...prev, segment: "other" } : prev,
-          );
         }
       }
     }
@@ -139,11 +134,7 @@ export function LeadCreateForm() {
     setNewSegmentLabel("");
     setNewSegmentColor(SEGMENT_COLOR_PALETTE[0]);
     setNewSegmentError(null);
-    const fallback =
-      previousSegment ||
-      segments.find((s) => s.is_archived === 0)?.slug ||
-      "other";
-    update("segment", fallback);
+    update("segment", previousSegment);
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -152,30 +143,27 @@ export function LeadCreateForm() {
     setError(null);
     try {
       const payload: Record<string, unknown> = {
-        name: form.name,
-        company: form.company,
-        country: form.country,
+        name: form.name.trim(),
+        company: form.company.trim(),
+        country: form.country.trim() || "DE",
         segment: form.segment,
         source: form.source,
         status: form.status,
+        email: form.email.trim() === "" ? null : form.email.trim(),
+        website: form.website.trim() === "" ? null : form.website.trim(),
+        city: form.city.trim() === "" ? null : form.city.trim(),
       };
-      if (form.email.trim()) payload.email = form.email.trim();
-      if (form.website.trim()) payload.website = form.website.trim();
-      if (form.city.trim()) payload.city = form.city.trim();
-      if (form.hook_text.trim()) payload.hook_text = form.hook_text.trim();
-      if (form.notes.trim()) payload.notes = form.notes.trim();
-
-      const res = await fetch("/api/leads", {
-        method: "POST",
+      const res = await fetch(`/api/leads/${lead.id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
-        throw new Error(data.error ?? "Не удалось создать лида");
+        throw new Error(data.error ?? "Не удалось сохранить");
       }
-      const lead = (await res.json()) as LeadRow;
-      router.push(`/leads/${lead.id}`);
+      const updated = (await res.json()) as LeadRow;
+      onSaved(updated);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ошибка");
       setSubmitting(false);
@@ -187,12 +175,12 @@ export function LeadCreateForm() {
   const labelCls = "block text-sm font-medium text-zinc-700 mb-1";
 
   const visibleSegments = segments.filter((s) => s.is_archived === 0);
+  const currentSegmentInList = visibleSegments.some(
+    (s) => s.slug === form.segment,
+  );
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="rounded-lg border border-zinc-200 bg-white p-6 max-w-2xl"
-    >
+    <form onSubmit={onSubmit} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Имя контакта</label>
@@ -257,6 +245,11 @@ export function LeadCreateForm() {
               <option value="">Загрузка...</option>
             ) : (
               <>
+                {!currentSegmentInList && form.segment ? (
+                  <option value={form.segment}>
+                    {form.segment} (текущий)
+                  </option>
+                ) : null}
                 {visibleSegments.map((s) => (
                   <option key={s.slug} value={s.slug}>
                     {s.label_ru}
@@ -362,45 +355,32 @@ export function LeadCreateForm() {
               </option>
             ))}
           </select>
-        </div>
-        <div className="sm:col-span-2">
-          <label className={labelCls}>Hook (локация / зацепка)</label>
-          <textarea
-            value={form.hook_text}
-            onChange={(e) => update("hook_text", e.target.value)}
-            rows={3}
-            className={inputCls}
-          />
-        </div>
-        <div className="sm:col-span-2">
-          <label className={labelCls}>Заметки</label>
-          <textarea
-            value={form.notes}
-            onChange={(e) => update("notes", e.target.value)}
-            rows={3}
-            className={inputCls}
-          />
+          <p className="mt-1 text-xs text-zinc-500">
+            Прямое изменение статуса (без создания события). Для обычного потока
+            используй быстрые кнопки в карточке.
+          </p>
         </div>
       </div>
 
       {error ? (
-        <div className="mt-4 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800">
+        <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800">
           {error}
         </div>
       ) : null}
 
-      <div className="mt-6 flex gap-2">
+      <div className="flex gap-2">
         <button
           type="submit"
           disabled={submitting}
           className="rounded-md bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-800 disabled:opacity-50"
         >
-          {submitting ? "Создаём..." : "Создать"}
+          {submitting ? "Сохраняем..." : "Сохранить"}
         </button>
         <button
           type="button"
-          onClick={() => router.back()}
-          className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-100"
+          onClick={onCancel}
+          disabled={submitting}
+          className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-100 disabled:opacity-50"
         >
           Отмена
         </button>

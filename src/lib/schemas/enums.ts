@@ -1,6 +1,52 @@
 import { z } from "zod";
 
-export const SEGMENTS = ["gastro", "services", "office", "entertainment"] as const;
+export const SEGMENT_COLOR_PALETTE = [
+  "amber",
+  "lime",
+  "rose",
+  "orange",
+  "yellow",
+  "stone",
+  "blue",
+  "zinc",
+  "emerald",
+  "teal",
+  "purple",
+  "indigo",
+  "pink",
+  "sky",
+  "cyan",
+  "fuchsia",
+  "green",
+  "violet",
+  "red",
+] as const;
+export type SegmentColor = (typeof SEGMENT_COLOR_PALETTE)[number];
+
+export const SEGMENTS = [
+  "climbing",
+  "padel",
+  "pilates",
+  "trampoline",
+  "lasertag",
+  "comedy",
+  "church",
+  "bowling",
+  "martial_arts",
+  "yoga",
+  "axe_throwing",
+  "physio",
+  "exit_room",
+  "vr",
+  "dance",
+  "training",
+  "skate",
+  "arcade",
+  "minigolf",
+  "immersive",
+  "crossfit",
+  "other",
+] as const;
 export const SEGMENT_WITH_ANY = [...SEGMENTS, "any"] as const;
 
 export const SOURCES = ["linkedin", "google", "catalog", "referral", "other"] as const;
@@ -36,8 +82,8 @@ export const EVENT_TYPES = [
 export const TEMPLATE_KINDS = ["initial", "fup1", "fup2"] as const;
 export const TEMPLATE_LANGUAGES = ["ru", "de", "en"] as const;
 
-export const Segment = z.enum(SEGMENTS);
-export const SegmentWithAny = z.enum(SEGMENT_WITH_ANY);
+export const Segment = z.string().trim().min(1).max(50);
+export const SegmentWithAny = z.string().trim().min(1).max(50);
 export const Source = z.enum(SOURCES);
 export const LeadStatus = z.enum(LEAD_STATUSES);
 export const EventType = z.enum(EVENT_TYPES);
@@ -53,10 +99,28 @@ export type TemplateKind = z.infer<typeof TemplateKind>;
 export type TemplateLanguage = z.infer<typeof TemplateLanguage>;
 
 export const SEGMENT_LABELS_RU: Record<Segment, string> = {
-  gastro: "Гастро",
-  services: "Услуги (фитнес/красота/медицина)",
-  office: "Офис / склад",
-  entertainment: "Развлечения",
+  climbing: "Скалодром",
+  padel: "Падель",
+  pilates: "Пилатес",
+  trampoline: "Батутный центр",
+  lasertag: "Лазертаг",
+  comedy: "Comedy Club",
+  church: "Церкви и общины",
+  bowling: "Боулинг",
+  martial_arts: "Боевые искусства",
+  yoga: "Йога",
+  axe_throwing: "Метание топора",
+  physio: "Физиотерапия",
+  exit_room: "Exit Room",
+  vr: "VR",
+  dance: "Танцевальная студия",
+  training: "Тренинги",
+  skate: "Скейтборд и рампы",
+  arcade: "Аркада",
+  minigolf: "Мини-гольф",
+  immersive: "Иммерсивные выставки",
+  crossfit: "Кроссфит",
+  other: "Прочее",
 };
 
 export const LEAD_STATUS_LABELS_RU: Record<LeadStatus, string> = {

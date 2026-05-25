@@ -2,13 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import type { LeadRow, Segment, LeadStatus } from "@/lib/schemas";
-import {
-  SEGMENTS,
-  LEAD_STATUSES,
-  SEGMENT_LABELS_RU,
-  LEAD_STATUS_LABELS_RU,
-} from "@/lib/schemas";
+import type { LeadRow, LeadStatus, SegmentRow } from "@/lib/schemas";
+import { LEAD_STATUSES, LEAD_STATUS_LABELS_RU } from "@/lib/schemas";
 import type { NextAction, NextActionKind } from "@/lib/pipeline/getNextAction";
 
 export interface ActiveLeadItem {
@@ -39,9 +34,21 @@ const URGENCY_TEXT_CLASS: Record<string, string> = {
   later: "text-zinc-500",
 };
 
-export function ActiveLeadsTable({ items }: { items: ActiveLeadItem[] }) {
-  const [segment, setSegment] = useState<Segment | "">("");
+export function ActiveLeadsTable({
+  items,
+  segments,
+}: {
+  items: ActiveLeadItem[];
+  segments: SegmentRow[];
+}) {
+  const [segment, setSegment] = useState<string>("");
   const [status, setStatus] = useState<LeadStatus | "">("");
+
+  const segmentLabel = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const s of segments) map.set(s.slug, s.label_ru);
+    return (slug: string) => map.get(slug) ?? slug;
+  }, [segments]);
 
   const filtered = useMemo(() => {
     return items.filter((it) => {
@@ -63,13 +70,13 @@ export function ActiveLeadsTable({ items }: { items: ActiveLeadItem[] }) {
           <span>Сегмент:</span>
           <select
             value={segment}
-            onChange={(e) => setSegment(e.target.value as Segment | "")}
+            onChange={(e) => setSegment(e.target.value)}
             className="border border-zinc-300 bg-white rounded-md px-2 py-1 text-sm"
           >
             <option value="">Все</option>
-            {SEGMENTS.map((s) => (
-              <option key={s} value={s}>
-                {SEGMENT_LABELS_RU[s]}
+            {segments.map((s) => (
+              <option key={s.slug} value={s.slug}>
+                {s.label_ru}
               </option>
             ))}
           </select>
@@ -101,7 +108,6 @@ export function ActiveLeadsTable({ items }: { items: ActiveLeadItem[] }) {
           <table className="min-w-full text-sm">
             <thead className="bg-zinc-50 text-zinc-600">
               <tr>
-                <th className="text-left px-3 py-2 font-medium">Имя</th>
                 <th className="text-left px-3 py-2 font-medium">Компания</th>
                 <th className="text-left px-3 py-2 font-medium">Сегмент</th>
                 <th className="text-left px-3 py-2 font-medium">Статус</th>
@@ -126,14 +132,16 @@ export function ActiveLeadsTable({ items }: { items: ActiveLeadItem[] }) {
                         href={`/leads/${it.lead.id}`}
                         className="text-zinc-900 hover:underline"
                       >
-                        {it.lead.name}
+                        {it.lead.company}
                       </Link>
+                      {it.lead.name ? (
+                        <div className="text-xs text-zinc-500 mt-0.5">
+                          {it.lead.name}
+                        </div>
+                      ) : null}
                     </td>
                     <td className="px-3 py-2 text-zinc-700">
-                      {it.lead.company}
-                    </td>
-                    <td className="px-3 py-2 text-zinc-700">
-                      {SEGMENT_LABELS_RU[it.lead.segment]}
+                      {segmentLabel(it.lead.segment)}
                     </td>
                     <td className="px-3 py-2 text-zinc-700">
                       {LEAD_STATUS_LABELS_RU[it.lead.status]}

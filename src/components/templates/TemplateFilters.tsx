@@ -2,23 +2,18 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import {
-  SEGMENT_LABELS_RU,
-  SEGMENT_WITH_ANY,
   TEMPLATE_KINDS,
   TEMPLATE_KIND_LABELS_RU,
-  type SegmentWithAny,
+  type SegmentRow,
 } from "@/lib/schemas";
 
-const SEGMENT_LABEL_WITH_ANY: Record<SegmentWithAny, string> = {
-  ...SEGMENT_LABELS_RU,
-  any: "Любой (универсальный)",
-};
-
-export function TemplateFilters() {
+export function TemplateFilters({ segments }: { segments: SegmentRow[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const segment = searchParams.get("segment") ?? "";
   const kind = searchParams.get("kind") ?? "";
+
+  const activeSegments = segments.filter((s) => s.is_archived === 0);
 
   function update(name: "segment" | "kind", value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -41,9 +36,10 @@ export function TemplateFilters() {
           className="rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm focus:border-zinc-900 focus:outline-none"
         >
           <option value="">Все</option>
-          {SEGMENT_WITH_ANY.map((s) => (
-            <option key={s} value={s}>
-              {SEGMENT_LABEL_WITH_ANY[s]}
+          <option value="any">Любой (универсальный)</option>
+          {activeSegments.map((s) => (
+            <option key={s.slug} value={s.slug}>
+              {s.label_ru}
             </option>
           ))}
         </select>

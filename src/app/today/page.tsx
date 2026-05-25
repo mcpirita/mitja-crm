@@ -3,6 +3,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { TodayGroup } from "@/components/today/TodayGroup";
 import { ActiveLeadsTable } from "@/components/today/ActiveLeadsTable";
 import { getDb } from "@/lib/db/getDb";
+import { listSegments } from "@/lib/db/segments";
 import { getNextAction } from "@/lib/pipeline/getNextAction";
 import type {
   LeadRow,
@@ -32,6 +33,7 @@ function rowToLead(row: Record<string, unknown>): LeadRow {
     status: row.status as LeadStatus,
     hook_text: (row.hook_text as string | null) ?? null,
     notes: (row.notes as string | null) ?? null,
+    last_status_raw: (row.last_status_raw as string | null) ?? null,
     next_action_due: (row.next_action_due as string | null) ?? null,
     created_at: String(row.created_at),
     updated_at: String(row.updated_at),
@@ -53,6 +55,7 @@ function rowToEvent(row: Record<string, unknown>): OutreachEventRow {
 
 export default async function TodayPage() {
   const db = getDb();
+  const segments = await listSegments();
 
   const leadsRes = await db.execute({
     sql: "SELECT * FROM leads ORDER BY id ASC",
@@ -132,18 +135,21 @@ export default async function TodayPage() {
             title="Просрочено"
             items={overdue}
             emptyHint="Ничего не просрочено."
+            segments={segments}
           />
           <TodayGroup
             title="На сегодня"
             items={todayList}
             emptyHint="На сегодня дел нет."
+            segments={segments}
           />
           <TodayGroup
             title="Скоро"
             items={soon}
             emptyHint="В ближайшие 3 дня ничего не наступает."
+            segments={segments}
           />
-          <ActiveLeadsTable items={allActive} />
+          <ActiveLeadsTable items={allActive} segments={segments} />
         </>
       )}
     </>

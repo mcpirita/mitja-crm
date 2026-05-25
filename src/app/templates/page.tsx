@@ -3,21 +3,15 @@ import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { TemplateFilters } from "@/components/templates/TemplateFilters";
 import { listTemplates } from "@/lib/db/templates";
+import { listSegments } from "@/lib/db/segments";
 import {
-  SEGMENT_LABELS_RU,
   SegmentWithAny,
   TEMPLATE_KIND_LABELS_RU,
   TemplateKind,
-  type SegmentWithAny as SegmentWithAnyT,
 } from "@/lib/schemas";
 
 export const metadata = {
   title: "Шаблоны · Mitja CRM",
-};
-
-const SEGMENT_LABEL_WITH_ANY: Record<SegmentWithAnyT, string> = {
-  ...SEGMENT_LABELS_RU,
-  any: "Любой",
 };
 
 function preview(body: string, limit = 80): string {
@@ -37,10 +31,21 @@ export default async function TemplatesPage({
     : null;
   const kindParsed = sp.kind ? TemplateKind.safeParse(sp.kind) : null;
 
-  const rows = await listTemplates({
-    segment: segmentParsed?.success ? segmentParsed.data : undefined,
-    kind: kindParsed?.success ? kindParsed.data : undefined,
-  });
+  const [segments, rows] = await Promise.all([
+    listSegments(),
+    listTemplates({
+      segment: segmentParsed?.success ? segmentParsed.data : undefined,
+      kind: kindParsed?.success ? kindParsed.data : undefined,
+    }),
+  ]);
+
+  const segmentLabelBySlug = new Map(
+    segments.map((s) => [s.slug, s.label_ru]),
+  );
+  function segmentLabel(slug: string): string {
+    if (slug === "any") return "Любой";
+    return segmentLabelBySlug.get(slug) ?? slug;
+  }
 
   const hasFilters = Boolean(sp.segment || sp.kind);
 
@@ -60,7 +65,7 @@ export default async function TemplatesPage({
       />
 
       <div className="mb-4">
-        <TemplateFilters />
+        <TemplateFilters segments={segments} />
       </div>
 
       {rows.length === 0 ? (
@@ -111,7 +116,7 @@ export default async function TemplatesPage({
                   </td>
                   <td className="px-4 py-3">
                     <span className="inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-700">
-                      {SEGMENT_LABEL_WITH_ANY[row.segment]}
+                      {segmentLabel(row.segment)}
                     </span>
                   </td>
                   <td className="px-4 py-3">

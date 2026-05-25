@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { TemplateForm } from "@/components/templates/TemplateForm";
 import { getTemplate } from "@/lib/db/templates";
+import { listSegments } from "@/lib/db/segments";
 
 export const metadata = {
   title: "Шаблон · Mitja CRM",
@@ -19,7 +20,10 @@ export default async function EditTemplatePage({
     notFound();
   }
 
-  const row = await getTemplate(id);
+  const [row, segments] = await Promise.all([
+    getTemplate(id),
+    listSegments({ includeArchived: true }),
+  ]);
   if (!row) {
     notFound();
   }
@@ -41,6 +45,7 @@ export default async function EditTemplatePage({
       <TemplateForm
         mode="edit"
         templateId={row.id}
+        segments={segments}
         initial={{
           name: row.name,
           segment: row.segment,

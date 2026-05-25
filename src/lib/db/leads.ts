@@ -23,6 +23,7 @@ function rowToLead(row: Record<string, unknown>): LeadRow {
     status: row.status as LeadStatus,
     hook_text: (row.hook_text as string | null) ?? null,
     notes: (row.notes as string | null) ?? null,
+    last_status_raw: (row.last_status_raw as string | null) ?? null,
     next_action_due: (row.next_action_due as string | null) ?? null,
     created_at: String(row.created_at),
     updated_at: String(row.updated_at),
@@ -79,7 +80,7 @@ export async function createLead(input: LeadCreate): Promise<LeadRow> {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       RETURNING *`,
     args: [
-      input.name,
+      input.name ?? "",
       input.company,
       input.email ?? null,
       input.website ?? null,
@@ -107,7 +108,7 @@ export async function updateLead(id: number, patch: LeadUpdate): Promise<LeadRow
     args.push(value);
   };
 
-  if (patch.name !== undefined) set("name", patch.name);
+  if (patch.name !== undefined) set("name", patch.name ?? "");
   if (patch.company !== undefined) set("company", patch.company);
   if (patch.email !== undefined) set("email", patch.email ?? null);
   if (patch.website !== undefined) set("website", patch.website ?? null);

@@ -21,6 +21,7 @@ function makeLead(overrides: Partial<LeadRow> = {}): LeadRow {
     status: "new",
     hook_text: null,
     notes: null,
+    last_status_raw: null,
     next_action_due: null,
     created_at: "2026-05-01 10:00:00",
     updated_at: "2026-05-01 10:00:00",

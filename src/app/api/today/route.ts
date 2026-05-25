@@ -25,6 +25,7 @@ function rowToLead(row: Record<string, unknown>): LeadRow {
     status: row.status as LeadStatus,
     hook_text: (row.hook_text as string | null) ?? null,
     notes: (row.notes as string | null) ?? null,
+    last_status_raw: (row.last_status_raw as string | null) ?? null,
     next_action_due: (row.next_action_due as string | null) ?? null,
     created_at: String(row.created_at),
     updated_at: String(row.updated_at),

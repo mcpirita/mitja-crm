@@ -10,7 +10,7 @@ export default function NewLeadPage() {
     <>
       <PageHeader
         title="Новый лид"
-        description="Заполните минимум: имя, компания, сегмент."
+        description="Заполните минимум: компания и сегмент. Имя контакта — опционально."
       />
       <LeadCreateForm />
     </>

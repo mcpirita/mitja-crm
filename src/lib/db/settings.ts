@@ -4,7 +4,7 @@ import { SettingsRow, type SettingsUpdate, type SettingsRow as SettingsRowType }
 export async function get(): Promise<SettingsRowType> {
   const db = getDb();
   const result = await db.execute({
-    sql: "SELECT id, translation_style, signature_ru, signature_de, updated_at FROM settings WHERE id = 1",
+    sql: "SELECT id, translation_style, signature_ru, signature_de, offer_description, updated_at FROM settings WHERE id = 1",
     args: [],
   });
   const row = result.rows[0];
@@ -16,6 +16,7 @@ export async function get(): Promise<SettingsRowType> {
     translation_style: row.translation_style as string,
     signature_ru: row.signature_ru as string,
     signature_de: row.signature_de as string,
+    offer_description: (row.offer_description as string) ?? "",
     updated_at: row.updated_at as string,
   });
   return parsed;
@@ -38,6 +39,10 @@ export async function update(patch: Partial<SettingsUpdate>): Promise<SettingsRo
   if (patch.signature_de !== undefined) {
     fields.push("signature_de = ?");
     args.push(patch.signature_de);
+  }
+  if (patch.offer_description !== undefined) {
+    fields.push("offer_description = ?");
+    args.push(patch.offer_description);
   }
 
   if (fields.length > 0) {

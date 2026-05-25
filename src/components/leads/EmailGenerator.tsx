@@ -60,6 +60,7 @@ export function EmailGenerator({ lead, onEventCreated }: Props) {
   const [bodyDe, setBodyDe] = useState("");
 
   const [translating, setTranslating] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [marking, setMarking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
@@ -135,6 +136,32 @@ export function EmailGenerator({ lead, onEventCreated }: Props) {
     setSelectedId(id);
     const tpl = templates.find((t) => t.id === id);
     if (tpl) applyTemplate(tpl);
+  }
+
+  async function onGenerate() {
+    setGenerating(true);
+    setError(null);
+    setInfo(null);
+    try {
+      const res = await fetch("/api/generate-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lead_id: lead.id, kind }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error ?? "Не удалось сгенерировать");
+      }
+      setSubjectRu(data.subject as string);
+      setBodyRu(data.body as string);
+      setSubjectDe("");
+      setBodyDe("");
+      setInfo("Черновик сгенерирован Claude. Проверь и при желании отредактируй.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Ошибка генерации");
+    } finally {
+      setGenerating(false);
+    }
   }
 
   async function onTranslate() {
@@ -260,6 +287,18 @@ export function EmailGenerator({ lead, onEventCreated }: Props) {
         </select>
       </div>
 
+      {templates.length === 0 && !templatesLoading ? (
+        <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          Шаблонов для «{lead.segment}» / «{TEMPLATE_KIND_LABELS_RU[kind]}» пока нет. Можешь написать письмо с нуля в поле ниже (переменные {"{name}"}, {"{company}"}, {"{city}"}, {"{hook}"} подставлять не будут), либо{" "}
+          <a
+            href={`/templates/new?segment=${lead.segment}&kind=${kind}`}
+            className="font-medium underline hover:text-amber-700"
+          >
+            создать шаблон
+          </a>
+          .
+        </div>
+      ) : null}
       {error ? (
         <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800">
           {error}
@@ -288,6 +327,14 @@ export function EmailGenerator({ lead, onEventCreated }: Props) {
           className={inputCls}
         />
         <div className="mt-2 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={onGenerate}
+            disabled={generating}
+            className="rounded-md bg-violet-700 px-3 py-1.5 text-sm text-white hover:bg-violet-800 disabled:opacity-50"
+          >
+            {generating ? "Генерируем..." : "Сгенерировать через Claude"}
+          </button>
           <button type="button" onClick={onTranslate} disabled={translating || !bodyRu.trim()} className={btnDark}>
             {translating ? "Переводим..." : "Перевести на немецкий"}
           </button>

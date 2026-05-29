@@ -43,8 +43,8 @@
 
 - Next.js 16 (App Router) + React 19 + TypeScript
 - Tailwind CSS v4
-- Turso (SQLite через `@libsql/client`) — добавим в Фазе 1.1
-- Деплой: Railway
+- Turso (SQLite через `@libsql/client`)
+- Деплой: Vercel (https://mitja-crm.vercel.app, авто-деплой при push в `main`)
 
 ---
 

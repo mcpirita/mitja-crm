@@ -35,6 +35,7 @@ Turso (libsql); сайт закрыт basic auth.
 - [x] Прописать env: `LIBSQL_URL`, `LIBSQL_AUTH_TOKEN`, `ANTHROPIC_API_KEY`, `BASIC_AUTH_USER`, `BASIC_AUTH_PASS`
 - [x] Задеплоить (`--prod`) → https://mitja-crm.vercel.app, проверено: 401 без пароля, данные из Turso отдаются
 
-## Осталось вручную (опционально)
-- [ ] Подключить GitHub→Vercel в дашборде для авто-деплоя при push (сейчас деплой через `vercel --prod`).
-      Нужно добавить GitHub login connection в Vercel-аккаунте.
+## Авто-деплой (готово)
+- [x] Подключён GitHub→Vercel: push в `main` → авто-сборка и выкат в прод.
+      Потребовалось: GitHub login connection в Vercel + установка Vercel GitHub App на репо
+      + `git config user.email gubi.dima@gmail.com` (Vercel не собирает коммиты с чужим email).

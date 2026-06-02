@@ -42,6 +42,21 @@ CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status);
 CREATE INDEX IF NOT EXISTS idx_leads_segment ON leads(segment);
 CREATE INDEX IF NOT EXISTS idx_leads_next_action_due ON leads(next_action_due);
 
+-- Дополнительные контакты лида. Главный контакт остаётся в leads.name / leads.email
+-- (денормализация — его используют письма, «сегодня» и списки). Здесь — все
+-- остальные имена/почты компании, с которыми идёт переписка.
+CREATE TABLE IF NOT EXISTS lead_contacts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    lead_id INTEGER NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+    name TEXT NOT NULL DEFAULT '',
+    email TEXT,
+    role TEXT,
+    notes TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_lead_contacts_lead ON lead_contacts(lead_id);
+CREATE INDEX IF NOT EXISTS idx_lead_contacts_email ON lead_contacts(email);
+
 CREATE TABLE IF NOT EXISTS outreach_events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     lead_id INTEGER NOT NULL REFERENCES leads(id) ON DELETE CASCADE,

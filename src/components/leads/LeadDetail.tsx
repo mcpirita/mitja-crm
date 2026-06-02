@@ -11,6 +11,7 @@ import { StatusQuickButtons } from "./StatusQuickButtons";
 import { EmailGenerator } from "./EmailGenerator";
 import { LeadEditForm } from "./LeadEditForm";
 import { LeadSpacesSection } from "./LeadSpacesSection";
+import { LeadContactsSection } from "./LeadContactsSection";
 
 interface Props {
   id: number;
@@ -261,6 +262,13 @@ export function LeadDetail({ id, segments }: Props) {
             </dl>
           </>
         )}
+      </section>
+
+      <section className="rounded-lg border border-zinc-200 bg-white p-6">
+        <h3 className="text-sm font-semibold text-zinc-900 mb-3">
+          Контакты
+        </h3>
+        <LeadContactsSection leadId={id} />
       </section>
 
       <section className="rounded-lg border border-zinc-200 bg-white p-6">

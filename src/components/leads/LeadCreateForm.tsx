@@ -24,7 +24,14 @@ const SOURCE_LABELS_RU: Record<(typeof SOURCES)[number], string> = {
 export function LeadCreateForm() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [submitMode, setSubmitMode] = useState<"go" | "again">("go");
   const [error, setError] = useState<string | null>(null);
+  const [justCreated, setJustCreated] = useState<string | null>(null);
+
+  const [duplicates, setDuplicates] = useState<
+    { lead: LeadRow; reasons: string[] }[]
+  >([]);
+  const [dupConfirmed, setDupConfirmed] = useState(false);
 
   const [segments, setSegments] = useState<SegmentRow[]>([]);
   const [segmentsLoading, setSegmentsLoading] = useState(true);
@@ -90,6 +97,11 @@ export function LeadCreateForm() {
 
   function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
+    // Поменяли идентифицирующее поле — сбрасываем подтверждение дубля.
+    if (key === "name" || key === "company" || key === "email") {
+      setDuplicates([]);
+      setDupConfirmed(false);
+    }
   }
 
   function onSegmentSelectChange(value: string) {
@@ -148,6 +160,33 @@ export function LeadCreateForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
+
+    // Шаг 1: проверка на дубли (пока пользователь не подтвердил «создать всё равно»).
+    if (!dupConfirmed) {
+      setSubmitting(true);
+      try {
+        const params = new URLSearchParams();
+        if (form.email.trim()) params.set("email", form.email.trim());
+        if (form.company.trim()) params.set("company", form.company.trim());
+        if (form.name.trim()) params.set("name", form.name.trim());
+        const res = await fetch(`/api/leads/check-duplicates?${params.toString()}`);
+        if (res.ok) {
+          const data = (await res.json()) as {
+            matches: { lead: LeadRow; reasons: string[] }[];
+          };
+          if (data.matches.length > 0) {
+            setDuplicates(data.matches);
+            setDupConfirmed(true); // следующий клик создаст несмотря на дубли
+            setSubmitting(false);
+            return;
+          }
+        }
+      } catch {
+        // Проверка дублей не критична — при сбое просто продолжаем создание.
+      }
+    }
+
     setSubmitting(true);
     setError(null);
     try {
@@ -175,7 +214,32 @@ export function LeadCreateForm() {
         throw new Error(data.error ?? "Не удалось создать лида");
       }
       const lead = (await res.json()) as LeadRow;
-      router.push(`/leads/${lead.id}`);
+      if (submitMode === "again") {
+        const keepSegment = form.segment;
+        const keepSource = form.source;
+        const keepStatus = form.status;
+        const keepCountry = form.country;
+        setForm({
+          name: "",
+          company: "",
+          email: "",
+          website: "",
+          country: keepCountry,
+          city: "",
+          segment: keepSegment,
+          source: keepSource,
+          status: keepStatus,
+          hook_text: "",
+          notes: "",
+        });
+        setJustCreated(lead.company || lead.name || "Лид");
+        setDuplicates([]);
+        setDupConfirmed(false);
+        setSubmitting(false);
+        router.refresh();
+      } else {
+        router.push(`/leads/${lead.id}`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ошибка");
       setSubmitting(false);
@@ -389,13 +453,63 @@ export function LeadCreateForm() {
         </div>
       ) : null}
 
-      <div className="mt-6 flex gap-2">
+      {duplicates.length > 0 ? (
+        <div className="mt-4 rounded-md border border-amber-300 bg-amber-50 px-3 py-3 text-sm text-amber-900">
+          <p className="font-medium">
+            Похоже, такой лид уже есть ({duplicates.length}):
+          </p>
+          <ul className="mt-2 space-y-1">
+            {duplicates.map(({ lead, reasons }) => (
+              <li key={lead.id}>
+                <a
+                  href={`/leads/${lead.id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium underline hover:text-amber-700"
+                >
+                  {lead.company}
+                  {lead.name ? ` — ${lead.name}` : ""}
+                </a>{" "}
+                <span className="text-amber-700">({reasons.join(", ")})</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-amber-700">
+            Нажмите «Создать всё равно», если это другой лид.
+          </p>
+        </div>
+      ) : null}
+
+      {justCreated ? (
+        <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+          Лид «{justCreated}» создан. Можно добавлять следующий.
+        </div>
+      ) : null}
+
+      <div className="mt-6 flex flex-wrap gap-2">
         <button
           type="submit"
+          onClick={() => setSubmitMode("go")}
           disabled={submitting}
           className="rounded-md bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-800 disabled:opacity-50"
         >
-          {submitting ? "Создаём..." : "Создать"}
+          {submitting && submitMode === "go"
+            ? "Создаём..."
+            : dupConfirmed
+              ? "Создать всё равно"
+              : "Создать"}
+        </button>
+        <button
+          type="submit"
+          onClick={() => setSubmitMode("again")}
+          disabled={submitting}
+          className="rounded-md border border-zinc-900 bg-white px-4 py-2 text-sm text-zinc-900 hover:bg-zinc-100 disabled:opacity-50"
+        >
+          {submitting && submitMode === "again"
+            ? "Создаём..."
+            : dupConfirmed
+              ? "Создать всё равно и добавить ещё"
+              : "Создать и добавить ещё"}
         </button>
         <button
           type="button"

@@ -46,3 +46,7 @@ local.db
 local.db-journal
 local.db-shm
 local.db-wal
+
+# данные клиентов и лидов — не коммитить (персональные данные)
+/data
+*.csv

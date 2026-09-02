@@ -39,12 +39,11 @@
       <path d="M58.9 409.6v43.5h43.5"/><path d="M453.1 409.6v43.5h-43.5"/>
     </g>
 
-    <!-- знак: M -->
-    <path d="M158 341.6V175.6L245 262.6L332 175.6V341.6"
-          fill="none" stroke="url(#ink)" stroke-width="44"
-          stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="6"/>
+    <!-- знак: C — дуга с разрезом вправо, концы срезаны по радиусу -->
+    <path d="M289.9 204.5A66 66 0 1 0 289.9 312.7"
+          fill="none" stroke="url(#ink)" stroke-width="44" stroke-linecap="butt"/>
     <!-- янтарная точка логотипа -->
-    <rect x="366" y="315.6" width="26" height="26" rx="5" fill="#e8a13c"/>
+    <rect x="320" y="315.6" width="26" height="26" rx="5" fill="#e8a13c"/>
     </g>
   </g>
 </svg>

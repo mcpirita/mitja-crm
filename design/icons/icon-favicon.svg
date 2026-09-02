@@ -13,9 +13,8 @@
     <rect width="512" height="512" fill="url(#tile)"/>
     <!-- знак крупнее и толще: на 16px мелкая графика превращается в кашу -->
     <g transform="translate(256 256) scale(1.28) translate(-256 -256)">
-      <path d="M158 341.6V175.6L245 262.6L332 175.6V341.6"
-            fill="none" stroke="url(#ink)" stroke-width="50"
-            stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="6"/>
+      <path d="M313.3 201.9A66 66 0 1 0 313.3 310.1"
+            fill="none" stroke="url(#ink)" stroke-width="50" stroke-linecap="butt"/>
     </g>
   </g>
 </svg>

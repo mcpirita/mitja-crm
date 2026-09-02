@@ -87,7 +87,7 @@ export function LeadContactsSection({ leadId }: Props) {
   }
 
   const inputCls =
-    "w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900";
+    "w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[var(--amber)]";
 
   if (loading) {
     return <div className="text-sm text-zinc-500">Загрузка...</div>;
@@ -128,7 +128,7 @@ export function LeadContactsSection({ leadId }: Props) {
                 {c.email ? (
                   <a
                     href={`mailto:${c.email}`}
-                    className="text-blue-600 hover:underline"
+                    className="text-[var(--amber-hi)] hover:underline"
                   >
                     {c.email}
                   </a>
@@ -190,7 +190,7 @@ export function LeadContactsSection({ leadId }: Props) {
               type="button"
               onClick={handleAdd}
               disabled={busy}
-              className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm text-white hover:bg-zinc-800 disabled:opacity-50"
+              className="btn btn-primary disabled:opacity-50"
             >
               {busy ? "Сохраняем…" : "Добавить контакт"}
             </button>
@@ -202,7 +202,7 @@ export function LeadContactsSection({ leadId }: Props) {
                 setError(null);
               }}
               disabled={busy}
-              className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100 disabled:opacity-50"
+              className="btn disabled:opacity-50"
             >
               Отмена
             </button>
@@ -212,7 +212,7 @@ export function LeadContactsSection({ leadId }: Props) {
         <button
           type="button"
           onClick={() => setAdding(true)}
-          className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100"
+          className="btn"
         >
           + Добавить контакт
         </button>

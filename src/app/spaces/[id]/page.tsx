@@ -32,7 +32,7 @@ export default async function EditSpacePage({
         actions={
           <Link
             href="/spaces"
-            className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
+            className="btn"
           >
             К списку
           </Link>

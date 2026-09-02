@@ -85,7 +85,7 @@ export function SettingsForm() {
 
   if (loading) {
     return (
-      <div className="rounded-lg border border-zinc-200 bg-white p-6 text-sm text-zinc-500">
+      <div className="panel p-6 text-sm text-zinc-500">
         Загрузка настроек…
       </div>
     );
@@ -93,8 +93,8 @@ export function SettingsForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <label className="block text-sm font-medium text-zinc-900">
+      <div className="panel p-6">
+        <label className="cap block mb-1">
           Оффер (описание здания и условий аренды)
         </label>
         <p className="mt-1 text-xs text-zinc-500">
@@ -104,12 +104,12 @@ export function SettingsForm() {
           rows={8}
           value={form.offer_description}
           onChange={(e) => onChange("offer_description", e.target.value)}
-          className="mt-3 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+          className="mt-3 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-[var(--amber)]"
         />
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <label className="block text-sm font-medium text-zinc-900">
+      <div className="panel p-6">
+        <label className="cap block mb-1">
           Стиль перевода (system-промпт для Claude)
         </label>
         <p className="mt-1 text-xs text-zinc-500">
@@ -119,12 +119,12 @@ export function SettingsForm() {
           rows={8}
           value={form.translation_style}
           onChange={(e) => onChange("translation_style", e.target.value)}
-          className="mt-3 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+          className="mt-3 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-[var(--amber)]"
         />
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <label className="block text-sm font-medium text-zinc-900">Подпись (RU)</label>
+      <div className="panel p-6">
+        <label className="cap block mb-1">Подпись (RU)</label>
         <p className="mt-1 text-xs text-zinc-500">
           Подставляется в конец русских писем.
         </p>
@@ -132,12 +132,12 @@ export function SettingsForm() {
           rows={4}
           value={form.signature_ru}
           onChange={(e) => onChange("signature_ru", e.target.value)}
-          className="mt-3 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+          className="mt-3 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-[var(--amber)]"
         />
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <label className="block text-sm font-medium text-zinc-900">Подпись (DE)</label>
+      <div className="panel p-6">
+        <label className="cap block mb-1">Подпись (DE)</label>
         <p className="mt-1 text-xs text-zinc-500">
           Подставляется в конец немецких писем после перевода.
         </p>
@@ -145,7 +145,7 @@ export function SettingsForm() {
           rows={4}
           value={form.signature_de}
           onChange={(e) => onChange("signature_de", e.target.value)}
-          className="mt-3 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+          className="mt-3 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-[var(--amber)]"
         />
       </div>
 
@@ -153,7 +153,7 @@ export function SettingsForm() {
         <button
           type="submit"
           disabled={saving}
-          className="inline-flex items-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn btn-primary disabled:cursor-not-allowed disabled:opacity-60"
         >
           {saving ? "Сохраняем…" : "Сохранить"}
         </button>

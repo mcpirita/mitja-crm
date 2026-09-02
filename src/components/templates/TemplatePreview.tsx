@@ -65,9 +65,9 @@ export function TemplatePreview({
   }
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-4">
+    <div className="panel p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-zinc-900">Превью</h3>
+        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[.22em] text-[var(--dim)]">Превью</h3>
         <span className="text-xs text-zinc-500">
           Фейковые данные: name=Анна, company=Bolderwelt, city=Pforzheim,
           hook=«пример хука»

@@ -57,7 +57,7 @@ export default async function TemplatesPage({
         actions={
           <Link
             href="/templates/new"
-            className="rounded-md bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700"
+            className="btn btn-primary"
           >
             Новый шаблон
           </Link>
@@ -82,7 +82,7 @@ export default async function TemplatesPage({
             !hasFilters ? (
               <Link
                 href="/templates/new"
-                className="rounded-md bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700"
+                className="btn btn-primary"
               >
                 Новый шаблон
               </Link>
@@ -90,9 +90,9 @@ export default async function TemplatesPage({
           }
         />
       ) : (
-        <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-zinc-200 bg-zinc-50 text-xs uppercase tracking-wide text-zinc-500">
+        <div className="overflow-hidden panel">
+          <table className="ops w-full text-left text-sm">
+            <thead>
               <tr>
                 <th className="px-4 py-3 font-medium">Название</th>
                 <th className="px-4 py-3 font-medium">Сегмент</th>

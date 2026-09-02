@@ -19,7 +19,7 @@ export default async function DuplicatesPage() {
         actions={
           <Link
             href="/leads"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100"
+            className="btn"
           >
             К списку
           </Link>
@@ -27,7 +27,7 @@ export default async function DuplicatesPage() {
       />
 
       {pairs.length === 0 ? (
-        <div className="rounded-lg border border-zinc-200 bg-white p-6 text-sm text-zinc-500">
+        <div className="panel p-6 text-sm text-zinc-500">
           Похожих лидов не найдено — дублей по названию компании нет.
         </div>
       ) : (
@@ -35,7 +35,7 @@ export default async function DuplicatesPage() {
           {pairs.map(({ a, b, reason }) => (
             <li
               key={`${a.id}-${b.id}`}
-              className="rounded-lg border border-zinc-200 bg-white p-4"
+              className="panel p-4"
             >
               <div className="mb-2 text-xs uppercase tracking-wide text-amber-700">
                 {reason}

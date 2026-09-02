@@ -25,6 +25,30 @@ const ACTION_ORDER: NextActionKind[] = [
   "awaiting",
 ];
 
+/** Заголовок секции: подпись · линия · счётчик. */
+export function SectionHead({
+  title,
+  count,
+  index,
+}: {
+  title: string;
+  count: number;
+  index?: string;
+}) {
+  return (
+    <div className="sec">
+      {index ? <span className="cap cap-amber">{index}</span> : null}
+      <h2 className="font-mono text-[11px] font-medium uppercase tracking-[.24em] text-[var(--dim)]">
+        {title}
+      </h2>
+      <span className="rule" />
+      <span className="font-mono text-[11px] text-[var(--dimmer)]">
+        {String(count).padStart(2, "0")}
+      </span>
+    </div>
+  );
+}
+
 export function TodayGroup({
   title,
   items,
@@ -38,12 +62,10 @@ export function TodayGroup({
 }) {
   if (items.length === 0) {
     return (
-      <section className="mb-6">
-        <h2 className="text-lg font-medium text-zinc-900 mb-2">
-          {title} <span className="text-zinc-400 text-sm">(0)</span>
-        </h2>
+      <section className="rise mb-8">
+        <SectionHead title={title} count={0} />
         {emptyHint ? (
-          <div className="text-sm text-zinc-500 rounded-md border border-dashed border-zinc-200 bg-white p-4">
+          <div className="rounded-[3px] border border-dashed border-[var(--line)] px-4 py-3.5 text-[13px] text-[var(--dimmer)] italic">
             {emptyHint}
           </div>
         ) : null}
@@ -63,19 +85,17 @@ export function TodayGroup({
   const orderedActions = ACTION_ORDER.filter((a) => byAction.has(a));
 
   return (
-    <section className="mb-6">
-      <h2 className="text-lg font-medium text-zinc-900 mb-3">
-        {title}{" "}
-        <span className="text-zinc-400 text-sm">({items.length})</span>
-      </h2>
-      <div className="space-y-4">
+    <section className="rise mb-8">
+      <SectionHead title={title} count={items.length} />
+      <div className="space-y-5">
         {orderedActions.map((action) => {
           const list = byAction.get(action) ?? [];
           return (
             <div key={action}>
-              <h3 className="text-sm font-medium text-zinc-700 mb-2">
-                {ACTION_LABELS[action]}{" "}
-                <span className="text-zinc-400">({list.length})</span>
+              <h3 className="cap mb-2.5 flex items-center gap-2 text-[9.5px]">
+                <span className="text-[var(--dim)]">{ACTION_LABELS[action]}</span>
+                <span>·</span>
+                <span>{list.length}</span>
               </h3>
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {list.map((it) => (

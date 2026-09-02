@@ -170,7 +170,7 @@ export function LeadDetail({ id, segments }: Props) {
     );
 
   const inputCls =
-    "w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900";
+    "w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[var(--amber)]";
 
   return (
     <div className="space-y-6">
@@ -180,7 +180,7 @@ export function LeadDetail({ id, segments }: Props) {
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-6">
+      <section className="panel p-6">
         {editing ? (
           <LeadEditForm
             lead={lead}
@@ -194,7 +194,7 @@ export function LeadDetail({ id, segments }: Props) {
           <>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-semibold text-zinc-900">{lead.company}</h2>
+                <h2 className="font-display text-[19px] font-bold tracking-[.03em] text-[var(--text)]">{lead.company}</h2>
                 {lead.name ? (
                   <div className="text-sm text-zinc-500">{lead.name}</div>
                 ) : null}
@@ -208,7 +208,7 @@ export function LeadDetail({ id, segments }: Props) {
                 <button
                   type="button"
                   onClick={() => setEditing(true)}
-                  className="rounded-md border border-zinc-300 bg-white px-3 py-1 text-xs text-zinc-700 hover:bg-zinc-100"
+                  className="btn"
                 >
                   Редактировать
                 </button>
@@ -222,7 +222,7 @@ export function LeadDetail({ id, segments }: Props) {
                   {lead.email ? (
                     <a
                       href={`mailto:${lead.email}`}
-                      className="text-blue-600 hover:underline"
+                      className="text-[var(--amber-hi)] hover:underline"
                     >
                       {lead.email}
                     </a>
@@ -239,7 +239,7 @@ export function LeadDetail({ id, segments }: Props) {
                       href={lead.website.startsWith("http") ? lead.website : `https://${lead.website}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-blue-600 hover:underline"
+                      className="text-[var(--amber-hi)] hover:underline"
                     >
                       {lead.website}
                     </a>
@@ -264,15 +264,15 @@ export function LeadDetail({ id, segments }: Props) {
         )}
       </section>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h3 className="text-sm font-semibold text-zinc-900 mb-3">
+      <section className="panel p-6">
+        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[.22em] text-[var(--dim)] mb-3">
           Контакты
         </h3>
         <LeadContactsSection leadId={id} />
       </section>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h3 className="text-sm font-semibold text-zinc-900 mb-2">
+      <section className="panel p-6">
+        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[.22em] text-[var(--dim)] mb-2">
           Hook (локация / зацепка)
         </h3>
         <textarea
@@ -287,7 +287,7 @@ export function LeadDetail({ id, segments }: Props) {
             type="button"
             onClick={saveHook}
             disabled={hookSaving}
-            className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm text-white hover:bg-zinc-800 disabled:opacity-50"
+            className="btn btn-primary disabled:opacity-50"
           >
             {hookSaving ? "Сохраняем..." : "Сохранить"}
           </button>
@@ -297,20 +297,20 @@ export function LeadDetail({ id, segments }: Props) {
         </div>
       </section>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h3 className="text-sm font-semibold text-zinc-900 mb-3">Предлагаемые помещения</h3>
+      <section className="panel p-6">
+        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[.22em] text-[var(--dim)] mb-3">Предлагаемые помещения</h3>
         <LeadSpacesSection leadId={id} />
       </section>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h3 className="text-sm font-semibold text-zinc-900 mb-3">
+      <section className="panel p-6">
+        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[.22em] text-[var(--dim)] mb-3">
           Быстрые действия
         </h3>
         <StatusQuickButtons leadId={id} onChange={onQuickAction} />
       </section>
 
       <section>
-        <h3 className="text-sm font-semibold text-zinc-900 mb-3">
+        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[.22em] text-[var(--dim)] mb-3">
           Письмо
         </h3>
         <div id="email-block">
@@ -324,13 +324,13 @@ export function LeadDetail({ id, segments }: Props) {
         </div>
       </section>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h3 className="text-sm font-semibold text-zinc-900 mb-3">Таймлайн</h3>
+      <section className="panel p-6">
+        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[.22em] text-[var(--dim)] mb-3">Таймлайн</h3>
         <EventTimeline events={events} />
       </section>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h3 className="text-sm font-semibold text-zinc-900 mb-2">Заметки</h3>
+      <section className="panel p-6">
+        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[.22em] text-[var(--dim)] mb-2">Заметки</h3>
         <textarea
           value={notesDraft}
           onChange={(e) => setNotesDraft(e.target.value)}
@@ -342,7 +342,7 @@ export function LeadDetail({ id, segments }: Props) {
             type="button"
             onClick={saveNotes}
             disabled={notesSaving}
-            className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm text-white hover:bg-zinc-800 disabled:opacity-50"
+            className="btn btn-primary disabled:opacity-50"
           >
             {notesSaving ? "Сохраняем..." : "Сохранить"}
           </button>

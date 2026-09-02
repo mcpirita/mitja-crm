@@ -27,9 +27,9 @@ export default async function SegmentsPage() {
           description="Создай первый сегмент из формы редактирования лида."
         />
       ) : (
-        <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-zinc-200 bg-zinc-50 text-xs uppercase tracking-wide text-zinc-500">
+        <div className="overflow-hidden panel">
+          <table className="ops w-full text-left text-sm">
+            <thead>
               <tr>
                 <th className="px-4 py-3 font-medium">Сегмент</th>
                 <th className="px-4 py-3 font-medium">Использование</th>

@@ -38,7 +38,7 @@ export default async function SpacesPage({
         actions={
           <Link
             href="/spaces/new"
-            className="rounded-md bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700"
+            className="btn btn-primary"
           >
             Новое помещение
           </Link>
@@ -50,7 +50,7 @@ export default async function SpacesPage({
         <select
           name="best_for"
           defaultValue={filterBestFor ?? ""}
-          className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-sm focus:border-zinc-900 focus:outline-none"
+          className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-sm focus:border-[var(--amber)] focus:outline-none"
         >
           <option value="">— все —</option>
           {SEGMENTS.map((s) => (
@@ -61,7 +61,7 @@ export default async function SpacesPage({
         </select>
         <button
           type="submit"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-1 text-sm text-zinc-700 hover:bg-zinc-50"
+          className="btn"
         >
           Применить
         </button>
@@ -87,7 +87,7 @@ export default async function SpacesPage({
             !hasFilter ? (
               <Link
                 href="/spaces/new"
-                className="rounded-md bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700"
+                className="btn btn-primary"
               >
                 Новое помещение
               </Link>
@@ -95,9 +95,9 @@ export default async function SpacesPage({
           }
         />
       ) : (
-        <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-zinc-200 bg-zinc-50 text-xs uppercase tracking-wide text-zinc-500">
+        <div className="overflow-hidden panel">
+          <table className="ops w-full text-left text-sm">
+            <thead>
               <tr>
                 <th className="px-4 py-3 font-medium">Название</th>
                 <th className="px-4 py-3 font-medium">Этаж</th>

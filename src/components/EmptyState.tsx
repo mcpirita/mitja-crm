@@ -10,12 +10,17 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="rounded-lg border border-dashed border-zinc-300 bg-white p-10 text-center">
-      <h2 className="text-lg font-medium text-zinc-900">{title}</h2>
+    <div className="panel rise px-8 py-12 text-center">
+      <div className="cap cap-amber mb-3">канал пуст</div>
+      <h2 className="font-display text-[17px] font-bold tracking-[.03em] text-[var(--text)]">
+        {title}
+      </h2>
       {description ? (
-        <p className="mt-2 text-sm text-zinc-600 max-w-md mx-auto">{description}</p>
+        <p className="mx-auto mt-2.5 max-w-md text-[13.5px] leading-relaxed text-[var(--dim)]">
+          {description}
+        </p>
       ) : null}
-      {action ? <div className="mt-4 flex justify-center">{action}</div> : null}
+      {action ? <div className="mt-5 flex justify-center">{action}</div> : null}
     </div>
   );
 }

@@ -1,12 +1,21 @@
 import Link from "next/link";
 import type { LeadRow, SegmentRow } from "@/lib/schemas";
 import { LEAD_STATUS_LABELS_RU } from "@/lib/schemas";
+import { STATUS_TONE } from "@/components/leads/StatusBadge";
 import type { NextAction } from "@/lib/pipeline/getNextAction";
 
-const URGENCY_BADGE: Record<string, string> = {
-  due: "bg-amber-100 text-amber-800 border-amber-200",
-  soon: "bg-blue-100 text-blue-800 border-blue-200",
-  later: "bg-zinc-100 text-zinc-700 border-zinc-200",
+const URGENCY_TONE: Record<string, string> = {
+  due: "amber",
+  soon: "steel",
+  later: "mute",
+};
+
+/** Цвет сигнальной планки слева: чем горячее, тем ярче. */
+const URGENCY_SIGNAL: Record<string, string> = {
+  due: "var(--amber)",
+  soon: "rgba(111,159,208,.55)",
+  later: "rgba(146,178,208,.2)",
+  backlog: "rgba(146,178,208,.12)",
 };
 
 function urgencyLabel(u: NextAction["urgency"]): string {
@@ -50,42 +59,54 @@ export function TodayCard({
   segments?: SegmentRow[];
 }) {
   const urgency = nextAction.urgency;
-  const badgeClass =
-    urgency && URGENCY_BADGE[urgency]
-      ? URGENCY_BADGE[urgency]
-      : "bg-zinc-100 text-zinc-700 border-zinc-200";
   // У бэклога бейджа нет вовсе: первое касание ничем не «горит».
   const showBadge = urgency !== null && urgency !== "backlog";
+  const signal = (urgency && URGENCY_SIGNAL[urgency]) || URGENCY_SIGNAL.backlog;
 
   return (
     <Link
       href={`/leads/${lead.id}`}
-      className="block rounded-md border border-zinc-200 bg-white p-3 hover:border-zinc-400 transition-colors"
+      className="group relative block overflow-hidden rounded-[3px] border border-[var(--line)] bg-[linear-gradient(168deg,var(--panel)_0%,var(--bg-2)_100%)] p-3 pl-3.5 transition-colors duration-150 hover:border-[var(--line-str)] hover:bg-[rgba(146,178,208,.06)]"
     >
+      <span
+        aria-hidden
+        className="absolute inset-y-0 left-0 w-[2px] transition-opacity duration-150 group-hover:opacity-100"
+        style={{ background: signal, opacity: 0.75 }}
+      />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="font-medium text-zinc-900 truncate">{lead.company}</div>
+          <div className="truncate text-[14px] font-medium text-[var(--text)] transition-colors group-hover:text-[var(--amber-hi)]">
+            {lead.company}
+          </div>
           {lead.name ? (
-            <div className="text-xs text-zinc-500 truncate">{lead.name}</div>
+            <div className="mt-0.5 truncate font-mono text-[10.5px] text-[var(--dimmer)]">
+              {lead.name}
+            </div>
           ) : null}
         </div>
         {showBadge ? (
           <span
-            className={`shrink-0 text-xs px-2 py-0.5 rounded-full border ${badgeClass}`}
+            className="chip shrink-0"
+            data-tone={URGENCY_TONE[urgency] ?? "mute"}
           >
             {urgencyLabel(urgency)}
           </span>
         ) : null}
       </div>
-      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-zinc-600">
-        <span className="px-2 py-0.5 rounded bg-zinc-100 border border-zinc-200">
+
+      <div className="mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+        <span className="font-mono text-[10px] uppercase tracking-[.1em] text-[var(--dim)]">
           {resolveSegmentLabel(lead.segment, segments)}
         </span>
-        <span className="px-2 py-0.5 rounded bg-zinc-50 border border-zinc-200">
+        <span className="h-2.5 w-px bg-[var(--line-str)]" aria-hidden />
+        <span
+          className="font-mono text-[10px] tracking-[.06em]"
+          style={{ color: `var(--tone-${STATUS_TONE[lead.status]})` }}
+        >
           {LEAD_STATUS_LABELS_RU[lead.status]}
         </span>
         {nextAction.due_date ? (
-          <span className="text-zinc-500">
+          <span className="ml-auto font-mono text-[10px] text-[var(--dimmer)]">
             {nextAction.days_waiting !== null && nextAction.days_waiting > 0
               ? `ждёт ${formatDaysRu(nextAction.days_waiting)}`
               : `срок ${formatDueShort(nextAction.due_date)}`}

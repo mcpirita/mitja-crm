@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { SegmentRow } from "@/lib/schemas";
 import { TodayCard } from "./TodayCard";
+import { SectionHead } from "./TodayGroup";
 import type { TodayItem } from "./TodayGroup";
 
 const PREVIEW_COUNT = 9;
@@ -31,11 +32,11 @@ export function BacklogGroup({
   const hidden = items.length - visible.length;
 
   return (
-    <section className="mb-6">
-      <h2 className="text-lg font-medium text-zinc-900 mb-1">
-        {title} <span className="text-zinc-400 text-sm">({items.length})</span>
-      </h2>
-      {hint ? <p className="text-sm text-zinc-500 mb-3">{hint}</p> : null}
+    <section className="rise mb-8">
+      <SectionHead title={title} count={items.length} />
+      {hint ? (
+        <p className="-mt-1 mb-3 text-[13px] text-[var(--dimmer)]">{hint}</p>
+      ) : null}
 
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((it) => (
@@ -52,9 +53,9 @@ export function BacklogGroup({
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="mt-3 text-sm text-zinc-600 hover:text-zinc-900 underline underline-offset-4"
+          className="btn mt-3"
         >
-          {expanded ? "Свернуть" : `Показать все (${items.length})`}
+          {expanded ? "свернуть" : `показать все · ${items.length}`}
         </button>
       ) : null}
     </section>

@@ -4,14 +4,31 @@ import { PRIORITY_LABELS_RU } from "@/lib/schemas";
 import { SegmentBadge } from "./SegmentBadge";
 import { StatusBadge } from "./StatusBadge";
 
+function parseDate(value: string): Date | null {
+  const d = new Date(value.replace(" ", "T") + (value.endsWith("Z") ? "" : "Z"));
+  return isNaN(d.getTime()) ? null : d;
+}
+
 function formatDate(value: string): string {
-  const tryDate = new Date(value.replace(" ", "T") + (value.endsWith("Z") ? "" : "Z"));
-  if (isNaN(tryDate.getTime())) return value;
-  return tryDate.toLocaleDateString("ru-RU", {
-    year: "numeric",
+  const d = parseDate(value);
+  if (!d) return value;
+  return d.toLocaleDateString("ru-RU", {
+    year: "2-digit",
     month: "2-digit",
     day: "2-digit",
   });
+}
+
+/** «сегодня» / «3 дн» — насколько давно карточка не двигалась. */
+function formatAgo(value: string): string | null {
+  const d = parseDate(value);
+  if (!d) return null;
+  const days = Math.floor((Date.now() - d.getTime()) / 86_400_000);
+  if (days <= 0) return "сегодня";
+  if (days === 1) return "вчера";
+  if (days < 30) return `${days} дн`;
+  const months = Math.floor(days / 30);
+  return `${months} мес`;
 }
 
 function resolveSegment(
@@ -23,60 +40,82 @@ function resolveSegment(
   return { label: slug, color: "zinc" };
 }
 
-const PRIORITY_CLASSES: Record<LeadRowType["priority"], string> = {
-  high: "bg-rose-100 text-rose-800",
-  medium: "bg-zinc-100 text-zinc-600",
-  low: "bg-zinc-50 text-zinc-400",
-};
-
 export function LeadRow({
   lead,
   segments,
+  index,
 }: {
   lead: LeadRowType;
   segments: SegmentRow[];
+  index?: number;
 }) {
   const seg = resolveSegment(lead.segment, segments);
+  const ago = formatAgo(lead.updated_at);
+  const stale = ago?.includes("мес") ?? false;
+
   return (
-    <tr className="border-b border-zinc-200 hover:bg-zinc-50">
-      <td className="px-3 py-2 align-middle">
-        <Link
-          href={`/leads/${lead.id}`}
-          className="font-medium text-zinc-900 hover:underline"
-        >
-          {lead.company}
-        </Link>
-        {lead.deal_type === "sale" ? (
-          <span className="ml-2 rounded px-1.5 py-0.5 text-[11px] bg-violet-100 text-violet-800 align-middle">
-            продажа
-          </span>
-        ) : null}
+    <tr data-prio={lead.priority}>
+      <td className="idx">
+        {index !== undefined ? String(index + 1).padStart(2, "0") : ""}
+      </td>
+      <td>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/leads/${lead.id}`}
+            className="truncate text-[14px] font-medium text-[var(--text)] transition-colors hover:text-[var(--amber-hi)]"
+          >
+            {lead.company}
+          </Link>
+          {/* тип сделки — тихая пометка: «продажа» встречается в большинстве строк */}
+          {lead.deal_type === "sale" ? (
+            <span className="shrink-0 font-mono text-[9px] uppercase tracking-[.16em] text-[rgba(155,140,228,.75)]">
+              продажа
+            </span>
+          ) : null}
+        </div>
         {lead.name ? (
-          <div className="text-xs text-zinc-500 mt-0.5">{lead.name}</div>
+          <div className="mt-0.5 truncate font-mono text-[10.5px] text-[var(--dimmer)]">
+            {lead.name}
+          </div>
         ) : null}
       </td>
-      <td className="px-3 py-2 align-middle">
+      <td>
         <SegmentBadge label={seg.label} color={seg.color} />
       </td>
-      <td className="px-3 py-2 align-middle">
+      <td>
         <StatusBadge status={lead.status} />
       </td>
-      <td className="px-3 py-2 align-middle">
+      <td>
         <span
-          className={`rounded px-1.5 py-0.5 text-xs ${PRIORITY_CLASSES[lead.priority]}`}
+          className="prio"
+          data-p={lead.priority}
+          title={`Приоритет: ${PRIORITY_LABELS_RU[lead.priority]}`}
         >
-          {PRIORITY_LABELS_RU[lead.priority]}
+          <i />
+          <i />
+          <i />
         </span>
       </td>
-      <td className="px-3 py-2 align-middle text-sm text-zinc-600">
+      <td className="whitespace-nowrap font-mono text-[11.5px] text-[var(--dim)]">
         {formatDate(lead.updated_at)}
+        {ago ? (
+          <span
+            className={
+              "ml-2 text-[10px] " +
+              (stale ? "text-[rgba(224,96,63,.75)]" : "text-[var(--dimmer)]")
+            }
+          >
+            {ago}
+          </span>
+        ) : null}
       </td>
-      <td className="px-3 py-2 align-middle text-right">
+      <td className="w-px pl-0 text-right">
         <Link
           href={`/leads/${lead.id}`}
-          className="text-sm text-blue-600 hover:underline"
+          className="go inline-block px-1"
+          aria-label={`Открыть ${lead.company}`}
         >
-          Открыть
+          →
         </Link>
       </td>
     </tr>

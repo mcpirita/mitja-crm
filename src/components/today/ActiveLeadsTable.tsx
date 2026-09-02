@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { LeadRow, LeadStatus, SegmentRow } from "@/lib/schemas";
 import { LEAD_STATUSES, LEAD_STATUS_LABELS_RU } from "@/lib/schemas";
+import { STATUS_TONE } from "@/components/leads/StatusBadge";
+import { SectionHead } from "./TodayGroup";
 import type { NextAction, NextActionKind } from "@/lib/pipeline/getNextAction";
 
 export interface ActiveLeadItem {
@@ -27,11 +29,11 @@ const URGENCY_LABELS: Record<string, string> = {
   backlog: "без срока",
 };
 
-const URGENCY_TEXT_CLASS: Record<string, string> = {
-  due: "text-amber-700",
-  soon: "text-blue-700",
-  later: "text-zinc-500",
-  backlog: "text-zinc-500",
+const URGENCY_COLOR: Record<string, string> = {
+  due: "var(--amber-hi)",
+  soon: "var(--steel)",
+  later: "var(--dim)",
+  backlog: "var(--dimmer)",
 };
 
 export function ActiveLeadsTable({
@@ -59,19 +61,16 @@ export function ActiveLeadsTable({
   }, [items, segment, status]);
 
   return (
-    <section>
-      <h2 className="text-lg font-medium text-zinc-900 mb-3">
-        Все активные{" "}
-        <span className="text-zinc-400 text-sm">({filtered.length})</span>
-      </h2>
+    <section className="rise">
+      <SectionHead title="Все активные" count={filtered.length} />
 
-      <div className="flex flex-wrap gap-3 mb-3">
-        <label className="text-sm text-zinc-700 flex items-center gap-2">
-          <span>Сегмент:</span>
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <label className="flex items-center gap-2">
+          <span className="cap">Сегмент</span>
           <select
             value={segment}
             onChange={(e) => setSegment(e.target.value)}
-            className="border border-zinc-300 bg-white rounded-md px-2 py-1 text-sm"
+            className="ctl py-1.5 text-[12.5px]"
           >
             <option value="">Все</option>
             {segments.map((s) => (
@@ -82,12 +81,12 @@ export function ActiveLeadsTable({
           </select>
         </label>
 
-        <label className="text-sm text-zinc-700 flex items-center gap-2">
-          <span>Статус:</span>
+        <label className="flex items-center gap-2">
+          <span className="cap">Статус</span>
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as LeadStatus | "")}
-            className="border border-zinc-300 bg-white rounded-md px-2 py-1 text-sm"
+            className="ctl py-1.5 text-[12.5px]"
           >
             <option value="">Все</option>
             {LEAD_STATUSES.map((s) => (
@@ -100,60 +99,65 @@ export function ActiveLeadsTable({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-md border border-dashed border-zinc-200 bg-white p-6 text-center text-sm text-zinc-500">
+        <div className="rounded-[3px] border border-dashed border-[var(--line)] px-4 py-6 text-center text-[13px] italic text-[var(--dimmer)]">
           Ничего не найдено.
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-md border border-zinc-200 bg-white">
-          <table className="min-w-full text-sm">
-            <thead className="bg-zinc-50 text-zinc-600">
+        <div className="panel overflow-x-auto">
+          <table className="ops min-w-full">
+            <thead>
               <tr>
-                <th className="text-left px-3 py-2 font-medium">Компания</th>
-                <th className="text-left px-3 py-2 font-medium">Сегмент</th>
-                <th className="text-left px-3 py-2 font-medium">Статус</th>
-                <th className="text-left px-3 py-2 font-medium">Действие</th>
-                <th className="text-left px-3 py-2 font-medium">Срок</th>
+                <th className="w-px pr-0">№</th>
+                <th>Компания</th>
+                <th>Сегмент</th>
+                <th>Статус</th>
+                <th>Действие</th>
+                <th className="w-px">Срок</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((it) => {
+              {filtered.map((it, i) => {
                 const urg = it.next_action.urgency;
-                const urgClass =
-                  urg && URGENCY_TEXT_CLASS[urg]
-                    ? URGENCY_TEXT_CLASS[urg]
-                    : "text-zinc-500";
                 return (
-                  <tr
-                    key={it.lead.id}
-                    className="border-t border-zinc-100 hover:bg-zinc-50"
-                  >
-                    <td className="px-3 py-2">
+                  <tr key={it.lead.id} data-prio={it.lead.priority}>
+                    <td className="idx">{String(i + 1).padStart(2, "0")}</td>
+                    <td>
                       <Link
                         href={`/leads/${it.lead.id}`}
-                        className="text-zinc-900 hover:underline"
+                        className="text-[14px] text-[var(--text)] transition-colors hover:text-[var(--amber-hi)]"
                       >
                         {it.lead.company}
                       </Link>
                       {it.lead.name ? (
-                        <div className="text-xs text-zinc-500 mt-0.5">
+                        <div className="mt-0.5 font-mono text-[10.5px] text-[var(--dimmer)]">
                           {it.lead.name}
                         </div>
                       ) : null}
                     </td>
-                    <td className="px-3 py-2 text-zinc-700">
+                    <td className="text-[12.5px] text-[var(--dim)]">
                       {segmentLabel(it.lead.segment)}
                     </td>
-                    <td className="px-3 py-2 text-zinc-700">
-                      {LEAD_STATUS_LABELS_RU[it.lead.status]}
+                    <td>
+                      <span
+                        className="font-mono text-[10.5px] tracking-[.06em]"
+                        style={{ color: `var(--tone-${STATUS_TONE[it.lead.status]})` }}
+                      >
+                        {LEAD_STATUS_LABELS_RU[it.lead.status]}
+                      </span>
                     </td>
-                    <td className="px-3 py-2 text-zinc-700">
+                    <td className="text-[12.5px] text-[var(--dim)]">
                       {ACTION_LABELS[it.next_action.action]}
                     </td>
-                    <td className={`px-3 py-2 ${urgClass}`}>
-                      {it.next_action.due_date ?? "—"}
+                    <td className="whitespace-nowrap font-mono text-[11px]">
+                      <span className="text-[var(--dim)]">
+                        {it.next_action.due_date ?? "—"}
+                      </span>
                       {urg ? (
-                        <span className="ml-2 text-xs">
-                          ({URGENCY_LABELS[urg]})
+                        <span
+                          className="ml-2 text-[10px]"
+                          style={{ color: URGENCY_COLOR[urg] ?? "var(--dimmer)" }}
+                        >
+                          {URGENCY_LABELS[urg]}
                         </span>
                       ) : null}
                     </td>

@@ -244,14 +244,14 @@ export function EmailGenerator({ lead, onEventCreated }: Props) {
   }
 
   const inputCls =
-    "w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900";
+    "w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[var(--amber)]";
   const btnDark =
-    "rounded-md bg-zinc-900 px-3 py-1.5 text-sm text-white hover:bg-zinc-800 disabled:opacity-50";
+    "btn btn-primary disabled:opacity-50";
   const btnLight =
-    "rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-800 hover:bg-zinc-50 disabled:opacity-50";
+    "btn disabled:opacity-50";
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-6 space-y-4">
+    <div className="panel p-6 space-y-4">
       <div className="flex flex-wrap items-center gap-3">
         <label className="text-sm text-zinc-600">Этап</label>
         <select
@@ -311,7 +311,7 @@ export function EmailGenerator({ lead, onEventCreated }: Props) {
       ) : null}
 
       <div>
-        <h4 className="text-sm font-semibold text-zinc-900 mb-2">Русский</h4>
+        <h4 className="font-mono text-[11px] font-medium uppercase tracking-[.22em] text-[var(--dim)] mb-2">Русский</h4>
         <input
           type="text"
           value={subjectRu}
@@ -350,7 +350,7 @@ export function EmailGenerator({ lead, onEventCreated }: Props) {
       </div>
 
       <div>
-        <h4 className="text-sm font-semibold text-zinc-900 mb-2">Немецкий</h4>
+        <h4 className="font-mono text-[11px] font-medium uppercase tracking-[.22em] text-[var(--dim)] mb-2">Немецкий</h4>
         <input
           type="text"
           value={subjectDe}

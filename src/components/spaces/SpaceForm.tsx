@@ -162,7 +162,7 @@ export function SpaceForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-lg border border-zinc-200 bg-white p-6"
+      className="panel p-6"
     >
       <div className="space-y-4">
         <Field label="Название">
@@ -171,7 +171,7 @@ export function SpaceForm({
             required
             value={values.name}
             onChange={(e) => update("name", e.target.value)}
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-900 focus:outline-none"
+            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-[var(--amber)] focus:outline-none"
             placeholder="Например: Kino 5"
           />
         </Field>
@@ -182,7 +182,7 @@ export function SpaceForm({
               type="text"
               value={values.floor}
               onChange={(e) => update("floor", e.target.value)}
-              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-900 focus:outline-none"
+              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-[var(--amber)] focus:outline-none"
               placeholder="EG / 1.OG / 3.OG"
             />
           </Field>
@@ -194,7 +194,7 @@ export function SpaceForm({
               min="0"
               value={values.area_m2}
               onChange={(e) => update("area_m2", e.target.value)}
-              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-900 focus:outline-none"
+              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-[var(--amber)] focus:outline-none"
               placeholder="170"
             />
           </Field>
@@ -208,7 +208,7 @@ export function SpaceForm({
             value={values.description}
             onChange={(e) => update("description", e.target.value)}
             rows={4}
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-900 focus:outline-none"
+            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-[var(--amber)] focus:outline-none"
             placeholder="Светлое камерное помещение с панорамными окнами, AV-инфраструктура..."
           />
         </Field>
@@ -228,7 +228,7 @@ export function SpaceForm({
                   className={
                     "rounded-full border px-3 py-1 text-xs transition-colors " +
                     (active
-                      ? "border-zinc-900 bg-zinc-900 text-white"
+                      ? "border-[var(--amber)] bg-[var(--amber-soft)] text-[var(--amber-hi)]"
                       : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50")
                   }
                 >
@@ -247,7 +247,7 @@ export function SpaceForm({
             value={values.internal_notes}
             onChange={(e) => update("internal_notes", e.target.value)}
             rows={3}
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-900 focus:outline-none"
+            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-[var(--amber)] focus:outline-none"
             placeholder="Например: ставка 12 €/м², свободно с июля..."
           />
         </Field>
@@ -275,14 +275,14 @@ export function SpaceForm({
             <button
               type="button"
               onClick={() => router.push("/spaces")}
-              className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
+              className="btn"
             >
               Отмена
             </button>
             <button
               type="submit"
               disabled={submitting || deleting}
-              className="rounded-md bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50"
+              className="btn btn-primary disabled:opacity-50"
             >
               {submitting
                 ? "Сохраняем..."

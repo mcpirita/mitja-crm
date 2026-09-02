@@ -33,7 +33,7 @@ export function TemplateFilters({ segments }: { segments: SegmentRow[] }) {
         <select
           value={segment}
           onChange={(e) => update("segment", e.target.value)}
-          className="rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm focus:border-zinc-900 focus:outline-none"
+          className="rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm focus:border-[var(--amber)] focus:outline-none"
         >
           <option value="">Все</option>
           <option value="any">Любой (универсальный)</option>
@@ -50,7 +50,7 @@ export function TemplateFilters({ segments }: { segments: SegmentRow[] }) {
         <select
           value={kind}
           onChange={(e) => update("kind", e.target.value)}
-          className="rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm focus:border-zinc-900 focus:outline-none"
+          className="rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm focus:border-[var(--amber)] focus:outline-none"
         >
           <option value="">Все</option>
           {TEMPLATE_KINDS.map((k) => (

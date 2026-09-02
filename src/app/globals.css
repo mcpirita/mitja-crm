@@ -1,5 +1,567 @@
 @import "tailwindcss";
 
-body {
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+/* ─────────────────────────────────────────────────────────────
+   MITJA CRM — оперативный пульт
+   Визуальный язык взят из «Штаба»: графит + янтарь, моноширинные
+   служебные подписи, координатная сетка, засечки по углам панелей.
+   ───────────────────────────────────────────────────────────── */
+
+@theme {
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
+  --font-display: var(--font-unbounded), var(--font-manrope), sans-serif;
+
+  /* острые углы: пульт, а не карточки в маркетплейсе */
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 5px;
+
+  /* Нейтральная шкала перевёрнута: zinc-50 — самая тёмная подложка,
+     zinc-900 — основной текст. Так весь старый разметочный код
+     (bg-white, text-zinc-900, border-zinc-200) сразу читается в тёмной теме. */
+  --color-white: #0f1720;
+  --color-zinc-50: #131d28;
+  --color-zinc-100: #18232f;
+  --color-zinc-200: #1e2b38;
+  --color-zinc-300: #26333f;
+  --color-zinc-400: #4d5f70;
+  --color-zinc-500: #71879b;
+  --color-zinc-600: #8b9fb1;
+  --color-zinc-700: #a8bacb;
+  --color-zinc-800: #c6d4e1;
+  --color-zinc-900: #dce6f0;
+  --color-zinc-950: #eef4fa;
+
+  /* Семантические цвета (ошибки, предупреждения, успех) переведены в тёмную
+     тему: светлые шаги 50-300 стали полупрозрачными подложками и рамками,
+     тёмные 600-900 — светящимся текстом. Шаги 400/500 не тронуты: на них
+     держатся образцы цвета сегментов. */
+  --color-rose-50: rgba(224, 96, 63, 0.09);
+  --color-rose-100: rgba(224, 96, 63, 0.13);
+  --color-rose-200: rgba(224, 96, 63, 0.28);
+  --color-rose-300: rgba(224, 96, 63, 0.4);
+  --color-rose-600: #d4917f;
+  --color-rose-700: #e28e76;
+  --color-rose-800: #ef9d85;
+  --color-rose-900: #f7b49f;
+  --color-red-50: rgba(224, 96, 63, 0.09);
+  --color-red-100: rgba(224, 96, 63, 0.13);
+  --color-red-200: rgba(224, 96, 63, 0.28);
+  --color-red-300: rgba(224, 96, 63, 0.4);
+  --color-red-600: #d4917f;
+  --color-red-700: #e28e76;
+  --color-red-800: #ef9d85;
+  --color-red-900: #f7b49f;
+  --color-amber-50: rgba(232, 161, 60, 0.09);
+  --color-amber-100: rgba(232, 161, 60, 0.14);
+  --color-amber-200: rgba(232, 161, 60, 0.28);
+  --color-amber-300: rgba(232, 161, 60, 0.4);
+  --color-amber-600: #d9a862;
+  --color-amber-700: #e8b26a;
+  --color-amber-800: #f3c07d;
+  --color-amber-900: #ffd49a;
+  --color-yellow-50: rgba(232, 206, 74, 0.09);
+  --color-yellow-100: rgba(232, 206, 74, 0.14);
+  --color-yellow-200: rgba(232, 206, 74, 0.28);
+  --color-yellow-800: #ecd889;
+  --color-yellow-900: #f4e4a3;
+  --color-emerald-50: rgba(138, 211, 154, 0.09);
+  --color-emerald-100: rgba(138, 211, 154, 0.13);
+  --color-emerald-200: rgba(138, 211, 154, 0.28);
+  --color-emerald-600: #7fbf90;
+  --color-emerald-700: #8ad39a;
+  --color-emerald-800: #9adfa8;
+  --color-emerald-900: #b0e8bb;
+  --color-green-50: rgba(138, 211, 154, 0.09);
+  --color-green-100: rgba(138, 211, 154, 0.13);
+  --color-green-200: rgba(138, 211, 154, 0.28);
+  --color-green-800: #9adfa8;
+  --color-green-900: #b0e8bb;
+  --color-blue-50: rgba(111, 159, 208, 0.09);
+  --color-blue-100: rgba(111, 159, 208, 0.13);
+  --color-blue-200: rgba(111, 159, 208, 0.28);
+  --color-blue-700: #7fadd8;
+  --color-blue-800: #93bce2;
+  --color-violet-100: rgba(155, 140, 228, 0.13);
+  --color-violet-200: rgba(155, 140, 228, 0.28);
+  --color-violet-800: #b0a4ec;
+  --color-violet-900: #c3b9f2;
+  --color-teal-100: rgba(69, 191, 174, 0.13);
+  --color-teal-200: rgba(69, 191, 174, 0.28);
+  --color-teal-800: #6fd0c0;
+  --color-cyan-100: rgba(95, 192, 196, 0.13);
+  --color-cyan-200: rgba(95, 192, 196, 0.28);
+  --color-cyan-800: #7fd0d4;
+  --color-indigo-100: rgba(127, 140, 232, 0.13);
+  --color-indigo-200: rgba(127, 140, 232, 0.24);
+  --color-indigo-300: rgba(127, 140, 232, 0.34);
+  --color-indigo-800: #9aa4ee;
+  --color-indigo-900: #b3bbf3;
+  --color-purple-100: rgba(169, 127, 224, 0.13);
+  --color-purple-200: rgba(169, 127, 224, 0.28);
+  --color-purple-800: #bb9aea;
+}
+
+:root {
+  --bg: #080d12;
+  --bg-2: #0b1219;
+  --panel: #0f1720;
+  --panel-hi: #141e29;
+  --line: rgba(146, 178, 208, 0.13);
+  --line-str: rgba(146, 178, 208, 0.26);
+  --text: #dce6f0;
+  --dim: #71879b;
+  --dimmer: #4d5f70;
+  --amber: #e8a13c;
+  --amber-hi: #ffc46b;
+  --amber-soft: rgba(232, 161, 60, 0.13);
+  --red: #e0603f;
+  --green: #8ad39a;
+  --steel: #6f9fd0;
+  --cyan: #5fc0c4;
+  --violet: #9b8ce4;
+
+  /* тона статусов — общие для чипов, таблиц и карточек */
+  --tone-mute: #4d5f70;
+  --tone-steel: #6f9fd0;
+  --tone-amber: #ffc46b;
+  --tone-violet: #9b8ce4;
+  --tone-cyan: #5fc0c4;
+  --tone-green: #8ad39a;
+  --tone-red: #e0603f;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* атмосфера: янтарное зарево сверху, холодный подсвет снизу */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(900px 520px at 78% -8%, rgba(232, 161, 60, 0.1), transparent 62%),
+      radial-gradient(760px 620px at 4% 104%, rgba(70, 130, 180, 0.09), transparent 60%),
+      linear-gradient(180deg, #0a1017 0%, #080d12 55%, #070b0f 100%);
+  }
+
+  /* координатная сетка, растворяется к низу экрана */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.32;
+    background-image:
+      linear-gradient(rgba(146, 178, 208, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(146, 178, 208, 0.045) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(1100px 700px at 50% 0%, #000 20%, transparent 85%);
+    -webkit-mask-image: radial-gradient(1100px 700px at 50% 0%, #000 20%, transparent 85%);
+  }
+
+  ::selection {
+    background: rgba(232, 161, 60, 0.26);
+    color: #fff;
+  }
+
+  /* поля ввода: утопленные, с янтарным фокусом */
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    background: rgba(0, 0, 0, 0.24);
+    border-color: var(--line);
+    color: var(--text);
+    transition: border-color 0.16s, box-shadow 0.16s, background 0.16s;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #3f4f5e;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--amber);
+    background: rgba(232, 161, 60, 0.05);
+    box-shadow: 0 0 0 3px rgba(232, 161, 60, 0.1);
+  }
+
+  select option,
+  select optgroup {
+    background: #0f1720;
+    color: var(--text);
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 1px solid var(--amber);
+    outline-offset: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(146, 178, 208, 0.16);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(232, 161, 60, 0.4);
+    background-clip: content-box;
+  }
+}
+
+@layer components {
+  /* ── зерно поверх всего ─────────────────────────────── */
+  .grain {
+    position: fixed;
+    inset: -50%;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.2;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+  }
+
+  /* ── панель с угловыми засечками ────────────────────── */
+  .panel {
+    position: relative;
+    background: linear-gradient(168deg, var(--panel) 0%, var(--bg-2) 100%);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+  }
+  .panel::before,
+  .panel::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    pointer-events: none;
+    border-color: var(--line-str);
+    border-style: solid;
+  }
+  .panel::before {
+    top: -1px;
+    left: -1px;
+    border-width: 1px 0 0 1px;
+  }
+  .panel::after {
+    bottom: -1px;
+    right: -1px;
+    border-width: 0 1px 1px 0;
+  }
+
+  /* ── служебная подпись ──────────────────────────────── */
+  .cap {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dimmer);
+  }
+  .cap-dim {
+    color: var(--dim);
+  }
+  .cap-amber {
+    color: var(--amber);
+  }
+
+  /* заголовок секции: индекс · подпись · линия · счётчик */
+  .sec {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .sec .rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--line-str), transparent);
+  }
+
+  /* ── кнопки ─────────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    cursor: pointer;
+    background: rgba(146, 178, 208, 0.05);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    color: var(--dim);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: 0.16s;
+  }
+  .btn:hover {
+    border-color: rgba(232, 161, 60, 0.55);
+    color: var(--amber-hi);
+    background: var(--amber-soft);
+  }
+  .btn-primary {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: #10160c;
+    font-weight: 700;
+  }
+  .btn-primary:hover {
+    background: var(--amber-hi);
+    border-color: var(--amber-hi);
+    color: #10160c;
+  }
+  .btn-danger:hover {
+    border-color: rgba(224, 96, 63, 0.6);
+    color: var(--red);
+    background: rgba(224, 96, 63, 0.1);
+  }
+
+  /* ── поле фильтра ───────────────────────────────────── */
+  .ctl {
+    padding: 7px 10px;
+    background: rgba(0, 0, 0, 0.24);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.2;
+  }
+  select.ctl {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 26px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='6'%3E%3Cpath d='M1 1l3.5 3.5L8 1' fill='none' stroke='%2371879b' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 9px center;
+    cursor: pointer;
+  }
+  select.ctl:hover {
+    border-color: var(--line-str);
+  }
+
+  /* ── чип статуса: точка + моноширинная подпись ──────── */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px 3px 7px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: rgba(146, 178, 208, 0.06);
+    color: var(--dim);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .chip::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    flex: none;
+    border-radius: 1px;
+    background: currentColor;
+  }
+  .chip.no-dot::before {
+    display: none;
+  }
+  .chip[data-tone="steel"] {
+    color: var(--steel);
+    border-color: rgba(111, 159, 208, 0.28);
+    background: rgba(111, 159, 208, 0.1);
+  }
+  .chip[data-tone="amber"] {
+    color: var(--amber-hi);
+    border-color: rgba(232, 161, 60, 0.32);
+    background: rgba(232, 161, 60, 0.11);
+  }
+  .chip[data-tone="violet"] {
+    color: var(--violet);
+    border-color: rgba(155, 140, 228, 0.28);
+    background: rgba(155, 140, 228, 0.1);
+  }
+  .chip[data-tone="cyan"] {
+    color: var(--cyan);
+    border-color: rgba(95, 192, 196, 0.28);
+    background: rgba(95, 192, 196, 0.1);
+  }
+  .chip[data-tone="green"] {
+    color: var(--green);
+    border-color: rgba(138, 211, 154, 0.3);
+    background: rgba(138, 211, 154, 0.1);
+  }
+  .chip[data-tone="red"] {
+    color: var(--red);
+    border-color: rgba(224, 96, 63, 0.3);
+    background: rgba(224, 96, 63, 0.1);
+  }
+  .chip[data-tone="mute"] {
+    color: var(--dimmer);
+    border-color: var(--line);
+    background: rgba(146, 178, 208, 0.04);
+  }
+
+  /* ── реестр лидов ───────────────────────────────────── */
+  .ops {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .ops thead th {
+    padding: 9px 12px 8px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dimmer);
+    background: rgba(0, 0, 0, 0.22);
+    border-bottom: 1px solid var(--line-str);
+    white-space: nowrap;
+  }
+  .ops tbody tr {
+    border-bottom: 1px solid rgba(146, 178, 208, 0.07);
+    transition: background 0.15s;
+    animation: rowin 0.34s cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
+  }
+  .ops tbody tr:last-child {
+    border-bottom: 0;
+  }
+  .ops tbody tr:hover {
+    background: rgba(146, 178, 208, 0.05);
+  }
+  .ops tbody td {
+    padding: 9px 12px;
+    vertical-align: middle;
+  }
+  /* сигнальная планка слева — приоритет лида, ярче при наведении */
+  .ops tbody td:first-child {
+    box-shadow: inset 2px 0 0 var(--sig, transparent);
+    transition: box-shadow 0.15s;
+  }
+  .ops tbody tr[data-prio="high"] {
+    --sig: rgba(232, 161, 60, 0.65);
+  }
+  .ops tbody tr[data-prio="medium"] {
+    --sig: rgba(146, 178, 208, 0.28);
+  }
+  .ops tbody tr[data-prio="low"] {
+    --sig: rgba(146, 178, 208, 0.1);
+  }
+  .ops tbody tr[data-prio="high"]:hover {
+    --sig: var(--amber-hi);
+  }
+  .ops tbody tr[data-prio="medium"]:hover,
+  .ops tbody tr[data-prio="low"]:hover {
+    --sig: var(--line-str);
+  }
+  .ops .idx {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: #35485a;
+    width: 1%;
+    padding-right: 0;
+  }
+  .ops tbody tr:hover .idx {
+    color: var(--dim);
+  }
+  .ops .go {
+    opacity: 0;
+    color: var(--amber-hi);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    transition: 0.16s;
+  }
+  .ops tbody tr:hover .go,
+  .ops tbody tr:focus-within .go {
+    opacity: 1;
+  }
+  .ops tbody tr:nth-child(1) { animation-delay: 0.01s }
+  .ops tbody tr:nth-child(2) { animation-delay: 0.03s }
+  .ops tbody tr:nth-child(3) { animation-delay: 0.05s }
+  .ops tbody tr:nth-child(4) { animation-delay: 0.07s }
+  .ops tbody tr:nth-child(5) { animation-delay: 0.09s }
+  .ops tbody tr:nth-child(6) { animation-delay: 0.11s }
+  .ops tbody tr:nth-child(7) { animation-delay: 0.13s }
+  .ops tbody tr:nth-child(8) { animation-delay: 0.15s }
+  .ops tbody tr:nth-child(9) { animation-delay: 0.17s }
+  .ops tbody tr:nth-child(10) { animation-delay: 0.19s }
+  .ops tbody tr:nth-child(n + 11) { animation-delay: 0.21s }
+
+  /* ── индикатор приоритета: три деления ──────────────── */
+  .prio {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 11px;
+  }
+  .prio i {
+    width: 3px;
+    border-radius: 1px;
+    background: rgba(146, 178, 208, 0.16);
+  }
+  .prio i:nth-child(1) { height: 5px }
+  .prio i:nth-child(2) { height: 8px }
+  .prio i:nth-child(3) { height: 11px }
+  .prio[data-p="high"] i { background: var(--amber) }
+  .prio[data-p="medium"] i:nth-child(1),
+  .prio[data-p="medium"] i:nth-child(2) { background: var(--dim) }
+  .prio[data-p="low"] i:nth-child(1) { background: var(--dimmer) }
+
+  /* точка сегмента вместо пастельной плашки */
+  .segdot {
+    width: 7px;
+    height: 7px;
+    flex: none;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(146, 178, 208, 0.09);
+  }
+
+  /* ── появление блоков ───────────────────────────────── */
+  .rise {
+    animation: rise 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
+  }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px) }
+  to { opacity: 1; transform: none }
+}
+
+@keyframes rowin {
+  from { opacity: 0; transform: translateX(-5px) }
+  to { opacity: 1; transform: none }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ops tbody tr,
+  .rise {
+    animation: none;
+  }
 }

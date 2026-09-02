@@ -20,13 +20,13 @@ export default async function LeadsPage() {
           <>
             <Link
               href="/leads/duplicates"
-              className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100"
+              className="btn"
             >
               Похожие
             </Link>
             <Link
               href="/leads/new"
-              className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm text-white hover:bg-zinc-800"
+              className="btn btn-primary"
             >
               Новый лид
             </Link>

@@ -31,8 +31,8 @@ interface Props {
 
 export function ColumnMapper({ headers, mapping, onChange }: Props) {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-5">
-      <h2 className="text-base font-medium text-zinc-900 mb-3">Сопоставление колонок</h2>
+    <div className="panel p-5">
+      <h2 className="font-mono text-[11px] font-medium uppercase tracking-[.22em] text-[var(--dim)] mb-3">Сопоставление колонок</h2>
       <p className="text-sm text-zinc-600 mb-4">
         Выберите, какая колонка CSV соответствует полю лида. Поля, отмеченные звёздочкой, обязательны.
       </p>

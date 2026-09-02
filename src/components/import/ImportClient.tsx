@@ -111,14 +111,14 @@ export function ImportClient() {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-lg border border-zinc-200 bg-white p-5">
+      <div className="panel p-5">
         <label className="flex flex-col gap-2 text-sm">
           <span className="font-medium text-zinc-800">CSV-файл</span>
           <input
             type="file"
             accept=".csv,text/csv"
             onChange={handleFile}
-            className="block w-full text-sm text-zinc-700 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-900 file:px-3 file:py-1.5 file:text-sm file:text-white file:hover:bg-zinc-800"
+            className="block w-full text-sm text-zinc-700 file:mr-3 file:rounded-md file:border-0 file:bg-[var(--amber)] file:px-3 file:py-1.5 file:text-sm file:text-[#10160c] file:hover:bg-[var(--amber-hi)]"
           />
         </label>
         {fileName ? (
@@ -147,7 +147,7 @@ export function ImportClient() {
             <button
               type="button"
               onClick={handleDryRun}
-              className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-800 hover:bg-zinc-100"
+              className="btn"
             >
               Dry-run (проверить)
             </button>
@@ -155,7 +155,7 @@ export function ImportClient() {
               type="button"
               onClick={handleImport}
               disabled={submitting || !dryRun || dryRun.validCount === 0}
-              className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-400"
+              className="btn btn-primary disabled:cursor-not-allowed disabled:bg-zinc-400"
             >
               {submitting ? "Импортируем…" : `Импортировать${dryRun ? ` (${validCount})` : ""}`}
             </button>

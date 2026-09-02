@@ -193,7 +193,7 @@ export function LeadSpacesSection({ leadId }: Props) {
             setAddValue(v);
             if (v) handleAdd(Number(v));
           }}
-          className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm focus:border-zinc-900 focus:outline-none disabled:opacity-50"
+          className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm focus:border-[var(--amber)] focus:outline-none disabled:opacity-50"
         >
           <option value="">
             {available.length === 0

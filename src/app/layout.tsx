@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Manrope, Unbounded, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { TopNav } from "@/components/TopNav";
+import { getCreds } from "@/lib/auth";
 
 const manrope = Manrope({
   subsets: ["latin", "cyrillic"],
@@ -61,7 +62,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans text-[15px] leading-relaxed">
         <div className="grain" aria-hidden />
-        <TopNav />
+        <TopNav authEnabled={Boolean(getCreds())} />
         <main className="relative z-2 flex-1 w-full max-w-[1240px] mx-auto px-4 py-7 sm:px-6 pb-24">
           {children}
         </main>

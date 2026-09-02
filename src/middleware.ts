@@ -1,37 +1,41 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { SESSION_COOKIE, checkBasicHeader, getCreds, verifySession } from "@/lib/auth";
 
-// Basic Auth для всего сайта. Логин/пароль берём из env.
-// Если BASIC_AUTH_USER/PASS не заданы (например, локально) — пропускаем всех.
-export function middleware(req: NextRequest) {
-  const user = process.env.BASIC_AUTH_USER;
-  const pass = process.env.BASIC_AUTH_PASS;
+/** Пути, доступные без входа: сама форма, её API и иконки. */
+const PUBLIC_PATHS = new Set(["/login", "/api/auth/login", "/api/auth/logout"]);
 
-  // Защита выключена, если креды не настроены.
-  if (!user || !pass) {
+export async function middleware(req: NextRequest) {
+  const creds = getCreds();
+
+  // Защита выключена, если креды не настроены (например, локально).
+  if (!creds) return NextResponse.next();
+
+  const { pathname, search } = req.nextUrl;
+  if (PUBLIC_PATHS.has(pathname)) return NextResponse.next();
+
+  const cookie = req.cookies.get(SESSION_COOKIE)?.value;
+  if (await verifySession(cookie, creds)) return NextResponse.next();
+
+  // Скрипты и curl продолжают ходить с заголовком Basic.
+  if (checkBasicHeader(req.headers.get("authorization"), creds)) {
     return NextResponse.next();
   }
 
-  const header = req.headers.get("authorization");
-  if (header?.startsWith("Basic ")) {
-    const decoded = atob(header.slice(6));
-    const sep = decoded.indexOf(":");
-    const u = decoded.slice(0, sep);
-    const p = decoded.slice(sep + 1);
-    if (u === user && p === pass) {
-      return NextResponse.next();
-    }
+  // Запросы данных не редиректим: фронт должен увидеть 401, а не HTML формы.
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.json({ error: "Нужен вход" }, { status: 401 });
   }
 
-  return new NextResponse("Authentication required", {
-    status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="Mitja CRM", charset="UTF-8"' },
-  });
+  const url = req.nextUrl.clone();
+  url.pathname = "/login";
+  url.search = "";
+  if (pathname !== "/") url.searchParams.set("next", pathname + search);
+  return NextResponse.redirect(url);
 }
 
 // Применяем ко всему, кроме статики Next и иконок с манифестом.
-// Иконки и манифест Chrome тянет отдельным запросом без наших кук и без
-// Basic-заголовка: под 401 он молча оставляет вкладку без иконки и не
-// предлагает установку. Поэтому эти файлы отдаём открыто — секретов в них нет.
+// Иконки и манифест браузер тянет отдельным запросом без наших кук: под 401
+// вкладка осталась бы без иконки и установка бы не предлагалась.
 export const config = {
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|icon.svg|icon-192.png|icon-512.png|icon-512-maskable.png|apple-touch-icon.png|manifest.webmanifest).*)",

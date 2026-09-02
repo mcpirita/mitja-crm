@@ -13,8 +13,11 @@ const NAV_ITEMS: { href: string; label: string }[] = [
   { href: "/settings", label: "Настройки" },
 ];
 
-export function TopNav() {
+export function TopNav({ authEnabled = false }: { authEnabled?: boolean }) {
   const pathname = usePathname();
+
+  // На экране входа навигация не нужна.
+  if (pathname === "/login") return null;
 
   return (
     <nav className="sticky top-0 z-20 w-full border-b border-[var(--line)] bg-[rgba(8,13,18,.92)] backdrop-blur-[14px]">
@@ -50,6 +53,17 @@ export function TopNav() {
             );
           })}
         </div>
+
+        {authEnabled ? (
+          <form action="/api/auth/logout" method="post" className="ml-auto shrink-0">
+            <button
+              type="submit"
+              className="rounded-[2px] border border-transparent px-2 py-1.5 font-mono text-[10px] uppercase tracking-[.16em] text-[var(--dimmer)] transition-colors hover:border-[var(--line)] hover:text-[var(--red)]"
+            >
+              выход
+            </button>
+          </form>
+        ) : null}
       </div>
     </nav>
   );

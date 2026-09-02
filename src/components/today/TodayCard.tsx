@@ -4,18 +4,34 @@ import { LEAD_STATUS_LABELS_RU } from "@/lib/schemas";
 import type { NextAction } from "@/lib/pipeline/getNextAction";
 
 const URGENCY_BADGE: Record<string, string> = {
-  overdue: "bg-red-100 text-red-800 border-red-200",
-  today: "bg-amber-100 text-amber-800 border-amber-200",
+  due: "bg-amber-100 text-amber-800 border-amber-200",
   soon: "bg-blue-100 text-blue-800 border-blue-200",
   later: "bg-zinc-100 text-zinc-700 border-zinc-200",
 };
 
 function urgencyLabel(u: NextAction["urgency"]): string {
-  if (u === "overdue") return "просрочено";
-  if (u === "today") return "сегодня";
+  if (u === "due") return "пора";
   if (u === "soon") return "скоро";
   if (u === "later") return "позже";
   return "";
+}
+
+/** 'YYYY-MM-DD' → 'DD.MM'. */
+export function formatDueShort(iso: string): string {
+  const [, m, d] = iso.split("-");
+  return `${d}.${m}`;
+}
+
+/** «16 дней» с правильным окончанием. */
+export function formatDaysRu(n: number): string {
+  const mod100 = n % 100;
+  const mod10 = n % 10;
+  let word = "дней";
+  if (mod100 < 11 || mod100 > 14) {
+    if (mod10 === 1) word = "день";
+    else if (mod10 >= 2 && mod10 <= 4) word = "дня";
+  }
+  return `${n} ${word}`;
 }
 
 function resolveSegmentLabel(slug: string, segments?: SegmentRow[]): string {
@@ -33,10 +49,13 @@ export function TodayCard({
   nextAction: NextAction;
   segments?: SegmentRow[];
 }) {
-  const urgencyClass =
-    nextAction.urgency && URGENCY_BADGE[nextAction.urgency]
-      ? URGENCY_BADGE[nextAction.urgency]
+  const urgency = nextAction.urgency;
+  const badgeClass =
+    urgency && URGENCY_BADGE[urgency]
+      ? URGENCY_BADGE[urgency]
       : "bg-zinc-100 text-zinc-700 border-zinc-200";
+  // У бэклога бейджа нет вовсе: первое касание ничем не «горит».
+  const showBadge = urgency !== null && urgency !== "backlog";
 
   return (
     <Link
@@ -50,11 +69,11 @@ export function TodayCard({
             <div className="text-xs text-zinc-500 truncate">{lead.name}</div>
           ) : null}
         </div>
-        {nextAction.urgency ? (
+        {showBadge ? (
           <span
-            className={`shrink-0 text-xs px-2 py-0.5 rounded-full border ${urgencyClass}`}
+            className={`shrink-0 text-xs px-2 py-0.5 rounded-full border ${badgeClass}`}
           >
-            {urgencyLabel(nextAction.urgency)}
+            {urgencyLabel(urgency)}
           </span>
         ) : null}
       </div>
@@ -66,7 +85,11 @@ export function TodayCard({
           {LEAD_STATUS_LABELS_RU[lead.status]}
         </span>
         {nextAction.due_date ? (
-          <span className="text-zinc-500">до {nextAction.due_date}</span>
+          <span className="text-zinc-500">
+            {nextAction.days_waiting !== null && nextAction.days_waiting > 0
+              ? `ждёт ${formatDaysRu(nextAction.days_waiting)}`
+              : `срок ${formatDueShort(nextAction.due_date)}`}
+          </span>
         ) : null}
       </div>
     </Link>

@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { TodayGroup } from "@/components/today/TodayGroup";
+import { BacklogGroup } from "@/components/today/BacklogGroup";
 import { ActiveLeadsTable } from "@/components/today/ActiveLeadsTable";
 import { getDb } from "@/lib/db/getDb";
 import { listSegments } from "@/lib/db/segments";
@@ -87,10 +88,10 @@ export default async function TodayPage() {
 
   const today = new Date();
 
-  const overdue: { lead: LeadRow; next_action: ReturnType<typeof getNextAction> }[] = [];
-  const todayList: typeof overdue = [];
-  const soon: typeof overdue = [];
-  const allActive: typeof overdue = [];
+  const due: { lead: LeadRow; next_action: ReturnType<typeof getNextAction> }[] = [];
+  const soon: typeof due = [];
+  const backlog: typeof due = [];
+  const allActive: typeof due = [];
 
   for (const lead of leads) {
     const evs = eventsByLead.get(lead.id) ?? [];
@@ -99,16 +100,15 @@ export default async function TodayPage() {
 
     const item = { lead, next_action };
     allActive.push(item);
-    if (next_action.urgency === "overdue") overdue.push(item);
-    else if (next_action.urgency === "today") todayList.push(item);
+    if (next_action.urgency === "due") due.push(item);
     else if (next_action.urgency === "soon") soon.push(item);
+    else if (next_action.urgency === "backlog") backlog.push(item);
   }
 
-  // Сначала по сроку, затем по приоритету: внутри одного дня (а «Написать
-  // первое» валится на сегодня целой пачкой) вверху должен быть «Высокий».
+  // Сначала по сроку (давние — вверху), затем по приоритету.
   const sortAsc = (
-    a: (typeof overdue)[number],
-    b: (typeof overdue)[number]
+    a: (typeof due)[number],
+    b: (typeof due)[number]
   ) => {
     const ad = a.next_action.due_date;
     const bd = b.next_action.due_date;
@@ -120,10 +120,16 @@ export default async function TodayPage() {
     }
     return PRIORITY_ORDER[a.lead.priority] - PRIORITY_ORDER[b.lead.priority];
   };
-  overdue.sort(sortAsc);
-  todayList.sort(sortAsc);
+  due.sort(sortAsc);
   soon.sort(sortAsc);
   allActive.sort(sortAsc);
+  // У бэклога срока нет — сортируем по приоритету, дальше по алфавиту.
+  backlog.sort((a, b) => {
+    const byPriority =
+      PRIORITY_ORDER[a.lead.priority] - PRIORITY_ORDER[b.lead.priority];
+    if (byPriority !== 0) return byPriority;
+    return a.lead.company.localeCompare(b.lead.company, "de");
+  });
 
   const isCompletelyEmpty = leads.length === 0;
 
@@ -131,7 +137,7 @@ export default async function TodayPage() {
     <>
       <PageHeader
         title="Сегодня"
-        description="Просроченные касания, сегодняшние, скоро — и таблица всех активных лидов."
+        description="Начатые переписки, по которым пора сделать шаг. Ниже — бэклог первых касаний без сроков."
       />
 
       {isCompletelyEmpty ? (
@@ -142,21 +148,21 @@ export default async function TodayPage() {
       ) : (
         <>
           <TodayGroup
-            title="Просрочено"
-            items={overdue}
-            emptyHint="Ничего не просрочено."
-            segments={segments}
-          />
-          <TodayGroup
-            title="На сегодня"
-            items={todayList}
-            emptyHint="На сегодня дел нет."
+            title="Пора написать"
+            items={due}
+            emptyHint="По начатым перепискам всё сделано."
             segments={segments}
           />
           <TodayGroup
             title="Скоро"
             items={soon}
             emptyHint="В ближайшие 3 дня ничего не наступает."
+            segments={segments}
+          />
+          <BacklogGroup
+            title="Новые контакты"
+            items={backlog}
+            hint="Ещё не писали. Срока нет — берите столько, сколько идёт сегодня."
             segments={segments}
           />
           <ActiveLeadsTable items={allActive} segments={segments} />

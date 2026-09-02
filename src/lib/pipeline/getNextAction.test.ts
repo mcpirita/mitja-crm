@@ -47,15 +47,16 @@ function makeEvent(
 const TODAY = new Date("2026-05-25T12:00:00Z");
 
 describe("getNextAction", () => {
-  it("новый лид без событий → send_initial today", () => {
+  it("новый лид без событий → send_initial backlog, без срока", () => {
     const lead = makeLead({ status: "new" });
     const result = getNextAction(lead, [], TODAY);
     expect(result.action).toBe("send_initial");
-    expect(result.due_date).toBe("2026-05-25");
-    expect(result.urgency).toBe("today");
+    expect(result.due_date).toBeNull();
+    expect(result.urgency).toBe("backlog");
+    expect(result.days_waiting).toBeNull();
   });
 
-  it("email_sent 8 дней назад → send_fup1 overdue", () => {
+  it("email_sent 8 дней назад → send_fup1 due, ждёт 1 день", () => {
     const lead = makeLead({ status: "contacted" });
     const events: OutreachEventRow[] = [
       makeEvent({ type: "email_sent", happened_at: "2026-05-17 09:00:00" }),
@@ -63,7 +64,8 @@ describe("getNextAction", () => {
     const result = getNextAction(lead, events, TODAY);
     expect(result.action).toBe("send_fup1");
     expect(result.due_date).toBe("2026-05-24");
-    expect(result.urgency).toBe("overdue");
+    expect(result.urgency).toBe("due");
+    expect(result.days_waiting).toBe(1);
   });
 
   it("email_sent сегодня → send_fup1 later (через 7 дней)", () => {
@@ -77,7 +79,7 @@ describe("getNextAction", () => {
     expect(result.urgency).toBe("later");
   });
 
-  it("fup1_sent 10 дней назад → send_fup2 today", () => {
+  it("fup1_sent 10 дней назад → send_fup2 due (срок сегодня)", () => {
     const lead = makeLead({ status: "fup1_sent" });
     const events: OutreachEventRow[] = [
       makeEvent({ id: 1, type: "email_sent", happened_at: "2026-05-01 09:00:00" }),
@@ -86,10 +88,11 @@ describe("getNextAction", () => {
     const result = getNextAction(lead, events, TODAY);
     expect(result.action).toBe("send_fup2");
     expect(result.due_date).toBe("2026-05-25");
-    expect(result.urgency).toBe("today");
+    expect(result.urgency).toBe("due");
+    expect(result.days_waiting).toBe(0);
   });
 
-  it("fup2_sent 14+ дней назад → mark_dead overdue", () => {
+  it("fup2_sent 14+ дней назад → mark_dead due", () => {
     const lead = makeLead({ status: "fup2_sent" });
     const events: OutreachEventRow[] = [
       makeEvent({ id: 1, type: "email_sent", happened_at: "2026-04-25 09:00:00" }),
@@ -99,7 +102,8 @@ describe("getNextAction", () => {
     const result = getNextAction(lead, events, TODAY);
     expect(result.action).toBe("mark_dead");
     expect(result.due_date).toBe("2026-05-24");
-    expect(result.urgency).toBe("overdue");
+    expect(result.urgency).toBe("due");
+    expect(result.days_waiting).toBe(1);
   });
 
   it("есть reply_received → done", () => {
@@ -141,6 +145,17 @@ describe("getNextAction", () => {
     expect(result.due_date).toBe("2026-05-29");
     // today=05-25, soonLimit=05-28, due=05-29 → later
     expect(result.urgency).toBe("later");
+  });
+
+  it("срок наступил месяц назад → всё те же due, без «просрочено»", () => {
+    const lead = makeLead({ status: "contacted" });
+    const events: OutreachEventRow[] = [
+      makeEvent({ type: "email_sent", happened_at: "2026-04-01 09:00:00" }),
+    ];
+    const result = getNextAction(lead, events, TODAY);
+    expect(result.action).toBe("send_fup1");
+    expect(result.urgency).toBe("due");
+    expect(result.days_waiting).toBe(46);
   });
 
   it("email_sent 5 дней назад → send_fup1 soon (due через 2 дня)", () => {

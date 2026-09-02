@@ -55,9 +55,12 @@ export interface TodayItem {
 }
 
 export interface TodayResponse {
-  overdue: TodayItem[];
-  today: TodayItem[];
+  /** Начатые переписки, у которых срок следующего шага уже наступил. */
+  due: TodayItem[];
+  /** Срок наступит в ближайшие 3 дня. */
   soon: TodayItem[];
+  /** Первые касания — без срока. */
+  backlog: TodayItem[];
   all_active: TodayItem[];
 }
 
@@ -100,9 +103,9 @@ export async function GET() {
 
     const today = new Date();
 
-    const overdue: TodayItem[] = [];
-    const todayList: TodayItem[] = [];
+    const due: TodayItem[] = [];
     const soon: TodayItem[] = [];
+    const backlog: TodayItem[] = [];
     const allActive: TodayItem[] = [];
 
     for (const lead of leads) {
@@ -114,20 +117,20 @@ export async function GET() {
       const item: TodayItem = { lead, next_action };
       allActive.push(item);
 
-      if (next_action.urgency === "overdue") overdue.push(item);
-      else if (next_action.urgency === "today") todayList.push(item);
+      if (next_action.urgency === "due") due.push(item);
       else if (next_action.urgency === "soon") soon.push(item);
+      else if (next_action.urgency === "backlog") backlog.push(item);
     }
 
-    overdue.sort(sortByDueAscNullsLast);
-    todayList.sort(sortByDueAscNullsLast);
+    due.sort(sortByDueAscNullsLast);
     soon.sort(sortByDueAscNullsLast);
     allActive.sort(sortByDueAscNullsLast);
+    backlog.sort((a, b) => a.lead.company.localeCompare(b.lead.company, "de"));
 
     const response: TodayResponse = {
-      overdue,
-      today: todayList,
+      due,
       soon,
+      backlog,
       all_active: allActive,
     };
     return NextResponse.json(response);

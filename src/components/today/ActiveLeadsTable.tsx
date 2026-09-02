@@ -21,17 +21,17 @@ const ACTION_LABELS: Record<NextActionKind, string> = {
 };
 
 const URGENCY_LABELS: Record<string, string> = {
-  overdue: "просрочено",
-  today: "сегодня",
+  due: "пора",
   soon: "скоро",
   later: "позже",
+  backlog: "без срока",
 };
 
 const URGENCY_TEXT_CLASS: Record<string, string> = {
-  overdue: "text-red-700",
-  today: "text-amber-700",
+  due: "text-amber-700",
   soon: "text-blue-700",
   later: "text-zinc-500",
+  backlog: "text-zinc-500",
 };
 
 export function ActiveLeadsTable({

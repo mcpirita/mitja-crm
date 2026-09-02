@@ -27,6 +27,21 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Mitja CRM",
   description: "Личная CRM для outreach по аренде в Пфорцхайме",
+  applicationName: "Mitja CRM",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    // Chrome берёт svg, старые вкладки и закладки — ico, iOS — png.
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "16x16 32x32 48x48" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Mitja CRM",
+    statusBarStyle: "black-translucent",
+  },
 };
 
 export const viewport = {

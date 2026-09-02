@@ -28,7 +28,12 @@ export function middleware(req: NextRequest) {
   });
 }
 
-// Применяем ко всему, кроме статики Next и фавикона.
+// Применяем ко всему, кроме статики Next и иконок с манифестом.
+// Иконки и манифест Chrome тянет отдельным запросом без наших кук и без
+// Basic-заголовка: под 401 он молча оставляет вкладку без иконки и не
+// предлагает установку. Поэтому эти файлы отдаём открыто — секретов в них нет.
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|icon-192.png|icon-512.png|icon-512-maskable.png|apple-touch-icon.png|manifest.webmanifest).*)",
+  ],
 };

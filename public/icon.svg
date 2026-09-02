@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Mitja CRM">
+  <title>Mitja CRM</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#111c28"/><stop offset="1" stop-color="#070b0f"/>
+    </linearGradient>
+    <radialGradient id="warm" cx=".8" cy="-.02" r=".95">
+      <stop offset="0" stop-color="#e8a13c" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#e8a13c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cold" cx=".05" cy="1.02" r=".85">
+      <stop offset="0" stop-color="#4682b4" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#4682b4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="halo" cx=".5" cy=".5" r=".46">
+      <stop offset="0" stop-color="#e8a13c" stop-opacity=".14"/>
+      <stop offset="1" stop-color="#e8a13c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ink" x1="0" y1=".3" x2="0" y2=".7">
+      <stop offset="0" stop-color="#ffc46b"/><stop offset="1" stop-color="#e8a13c"/>
+    </linearGradient>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0V64H0" fill="none" stroke="#92b2d0" stroke-opacity=".07" stroke-width="1"/>
+    </pattern>
+    <clipPath id="tileclip"><rect width="512" height="512" rx="96"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#tileclip)">
+    <rect width="512" height="512" fill="url(#tile)"/>
+    <rect width="512" height="512" fill="url(#grid)"/>
+    <rect width="512" height="512" fill="url(#warm)"/>
+    <rect width="512" height="512" fill="url(#cold)"/>
+    <rect width="512" height="512" fill="url(#halo)"/>
+
+    <!-- уголки прицела -->
+    <g fill="none" stroke="#92b2d0" stroke-opacity=".4" stroke-width="8.7" stroke-linecap="square">
+      <path d="M58.9 102.4V58.9h43.5"/><path d="M453.1 102.4V58.9h-43.5"/>
+      <path d="M58.9 409.6v43.5h43.5"/><path d="M453.1 409.6v43.5h-43.5"/>
+    </g>
+
+    <!-- знак: M -->
+    <path d="M158 341.6V175.6L245 262.6L332 175.6V341.6"
+          fill="none" stroke="url(#ink)" stroke-width="44"
+          stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="6"/>
+    <!-- янтарная точка логотипа -->
+    <rect x="366" y="315.6" width="26" height="26" rx="5" fill="#e8a13c"/>
+  </g>
+</svg>

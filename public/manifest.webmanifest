@@ -1,0 +1,17 @@
+{
+  "name": "Mitja CRM — outreach control",
+  "short_name": "Mitja CRM",
+  "description": "Личная CRM для холодного outreach: лиды, статусы, очередь касаний.",
+  "lang": "ru",
+  "start_url": "/today",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#080d12",
+  "theme_color": "#080d12",
+  "icons": [
+    { "src": "/icon.svg", "type": "image/svg+xml", "sizes": "any" },
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" },
+    { "src": "/icon-512-maskable.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Mitja CRM">
+  <title>Mitja CRM</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#152230"/><stop offset="1" stop-color="#080d12"/>
+    </linearGradient>
+    <linearGradient id="ink" x1="0" y1=".3" x2="0" y2=".7">
+      <stop offset="0" stop-color="#ffc46b"/><stop offset="1" stop-color="#e8a13c"/>
+    </linearGradient>
+    <clipPath id="tileclip"><rect width="512" height="512" rx="96"/></clipPath>
+  </defs>
+  <g clip-path="url(#tileclip)">
+    <rect width="512" height="512" fill="url(#tile)"/>
+    <!-- знак крупнее и толще: на 16px мелкая графика превращается в кашу -->
+    <g transform="translate(256 256) scale(1.28) translate(-256 -256)">
+      <path d="M158 341.6V175.6L245 262.6L332 175.6V341.6"
+            fill="none" stroke="url(#ink)" stroke-width="50"
+            stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="6"/>
+    </g>
+  </g>
+</svg>

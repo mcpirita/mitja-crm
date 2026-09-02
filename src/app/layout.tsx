@@ -25,6 +25,9 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
+/** Меняем при смене знака, чтобы браузеры не показывали старую иконку. */
+const ICON_VERSION = "2";
+
 export const metadata: Metadata = {
   title: "Mitja CRM",
   description: "Личная CRM для outreach по аренде в Пфорцхайме",
@@ -32,11 +35,13 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   icons: {
     // Chrome берёт svg, старые вкладки и закладки — ico, iOS — png.
+    // ?v — версия знака: Chrome держит favicon в отдельной базе и по одному
+    // и тому же URL показывает старую картинку даже после Cmd+Shift+R.
     icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "16x16 32x32 48x48" },
+      { url: `/icon.svg?v=${ICON_VERSION}`, type: "image/svg+xml" },
+      { url: `/favicon.ico?v=${ICON_VERSION}`, sizes: "16x16 32x32 48x48" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+    apple: [{ url: `/apple-touch-icon.png?v=${ICON_VERSION}`, sizes: "180x180" }],
   },
   appleWebApp: {
     capable: true,

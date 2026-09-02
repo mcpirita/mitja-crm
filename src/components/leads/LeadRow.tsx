@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { LeadRow as LeadRowType, SegmentRow } from "@/lib/schemas";
+import { PRIORITY_LABELS_RU } from "@/lib/schemas";
 import { SegmentBadge } from "./SegmentBadge";
 import { StatusBadge } from "./StatusBadge";
 
@@ -22,6 +23,12 @@ function resolveSegment(
   return { label: slug, color: "zinc" };
 }
 
+const PRIORITY_CLASSES: Record<LeadRowType["priority"], string> = {
+  high: "bg-rose-100 text-rose-800",
+  medium: "bg-zinc-100 text-zinc-600",
+  low: "bg-zinc-50 text-zinc-400",
+};
+
 export function LeadRow({
   lead,
   segments,
@@ -39,6 +46,11 @@ export function LeadRow({
         >
           {lead.company}
         </Link>
+        {lead.deal_type === "sale" ? (
+          <span className="ml-2 rounded px-1.5 py-0.5 text-[11px] bg-violet-100 text-violet-800 align-middle">
+            продажа
+          </span>
+        ) : null}
         {lead.name ? (
           <div className="text-xs text-zinc-500 mt-0.5">{lead.name}</div>
         ) : null}
@@ -48,6 +60,13 @@ export function LeadRow({
       </td>
       <td className="px-3 py-2 align-middle">
         <StatusBadge status={lead.status} />
+      </td>
+      <td className="px-3 py-2 align-middle">
+        <span
+          className={`rounded px-1.5 py-0.5 text-xs ${PRIORITY_CLASSES[lead.priority]}`}
+        >
+          {PRIORITY_LABELS_RU[lead.priority]}
+        </span>
       </td>
       <td className="px-3 py-2 align-middle text-sm text-zinc-600">
         {formatDate(lead.updated_at)}

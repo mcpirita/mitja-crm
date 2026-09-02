@@ -91,6 +91,37 @@ async function maybeRebuildTemplates(client: Client): Promise<boolean> {
   return true;
 }
 
+/**
+ * Добавляет колонки, появившиеся после первой версии таблицы leads.
+ * ALTER TABLE ADD COLUMN идемпотентен только вручную — проверяем pragma.
+ */
+async function maybeAddLeadColumns(client: Client): Promise<void> {
+  const r = await client.execute({ sql: "PRAGMA table_info(leads)", args: [] });
+  const existing = new Set(r.rows.map((row) => String(row.name)));
+
+  const additions: { column: string; ddl: string }[] = [
+    {
+      column: "deal_type",
+      ddl: "ALTER TABLE leads ADD COLUMN deal_type TEXT NOT NULL DEFAULT 'rent' CHECK (deal_type IN ('rent', 'sale'))",
+    },
+    {
+      column: "priority",
+      ddl: "ALTER TABLE leads ADD COLUMN priority TEXT NOT NULL DEFAULT 'medium' CHECK (priority IN ('high', 'medium', 'low'))",
+    },
+  ];
+
+  for (const { column, ddl } of additions) {
+    if (existing.has(column)) continue;
+    await client.execute({ sql: ddl, args: [] });
+    console.log(`Added leads.${column}.`);
+  }
+
+  await client.execute({
+    sql: "CREATE INDEX IF NOT EXISTS idx_leads_deal_type ON leads(deal_type)",
+    args: [],
+  });
+}
+
 async function main() {
   const url = process.env.LIBSQL_URL;
   if (!url) {
@@ -105,6 +136,9 @@ async function main() {
   // включающую новую таблицу segments и сиды.
   await maybeRebuildLeads(client);
   await maybeRebuildTemplates(client);
+  // После пересборки: CREATE TABLE IF NOT EXISTS в schema.sql не трогает
+  // существующую таблицу, поэтому новые колонки добавляем ALTER-ом.
+  await maybeAddLeadColumns(client);
 
   const sql = await readFile(resolve(process.cwd(), "src/lib/db/schema.sql"), "utf8");
   await client.executeMultiple(sql);

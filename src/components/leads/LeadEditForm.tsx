@@ -3,8 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  DEAL_TYPES,
+  DEAL_TYPE_LABELS_RU,
   LEAD_STATUSES,
   LEAD_STATUS_LABELS_RU,
+  PRIORITIES,
+  PRIORITY_LABELS_RU,
   SEGMENT_COLOR_PALETTE,
   SOURCES,
   type LeadRow,
@@ -55,6 +59,8 @@ export function LeadEditForm({ lead, onSaved, onCancel }: Props) {
     segment: lead.segment as string,
     source: lead.source,
     status: lead.status,
+    deal_type: lead.deal_type,
+    priority: lead.priority,
   });
 
   useEffect(() => {
@@ -149,6 +155,8 @@ export function LeadEditForm({ lead, onSaved, onCancel }: Props) {
         segment: form.segment,
         source: form.source,
         status: form.status,
+        deal_type: form.deal_type,
+        priority: form.priority,
         email: form.email.trim() === "" ? null : form.email.trim(),
         website: form.website.trim() === "" ? null : form.website.trim(),
         city: form.city.trim() === "" ? null : form.city.trim(),
@@ -323,6 +331,38 @@ export function LeadEditForm({ lead, onSaved, onCancel }: Props) {
               </div>
             </div>
           ) : null}
+        </div>
+        <div>
+          <label className={labelCls}>Тип сделки</label>
+          <select
+            value={form.deal_type}
+            onChange={(e) =>
+              update("deal_type", e.target.value as (typeof DEAL_TYPES)[number])
+            }
+            className={inputCls}
+          >
+            {DEAL_TYPES.map((d) => (
+              <option key={d} value={d}>
+                {DEAL_TYPE_LABELS_RU[d]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Приоритет</label>
+          <select
+            value={form.priority}
+            onChange={(e) =>
+              update("priority", e.target.value as (typeof PRIORITIES)[number])
+            }
+            className={inputCls}
+          >
+            {PRIORITIES.map((p) => (
+              <option key={p} value={p}>
+                {PRIORITY_LABELS_RU[p]}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <label className={labelCls}>Источник</label>

@@ -3,8 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  DEAL_TYPES,
+  DEAL_TYPE_LABELS_RU,
   LEAD_STATUSES,
   LEAD_STATUS_LABELS_RU,
+  PRIORITIES,
+  PRIORITY_LABELS_RU,
   SEGMENT_COLOR_PALETTE,
   SOURCES,
   type LeadRow,
@@ -56,6 +60,8 @@ export function LeadCreateForm() {
     segment: "" as string,
     source: "other" as (typeof SOURCES)[number],
     status: "new" as (typeof LEAD_STATUSES)[number],
+    deal_type: "rent" as (typeof DEAL_TYPES)[number],
+    priority: "medium" as (typeof PRIORITIES)[number],
     hook_text: "",
     notes: "",
   });
@@ -197,6 +203,8 @@ export function LeadCreateForm() {
         segment: form.segment,
         source: form.source,
         status: form.status,
+        deal_type: form.deal_type,
+        priority: form.priority,
       };
       if (form.email.trim()) payload.email = form.email.trim();
       if (form.website.trim()) payload.website = form.website.trim();
@@ -219,6 +227,8 @@ export function LeadCreateForm() {
         const keepSource = form.source;
         const keepStatus = form.status;
         const keepCountry = form.country;
+        const keepDealType = form.deal_type;
+        const keepPriority = form.priority;
         setForm({
           name: "",
           company: "",
@@ -229,6 +239,8 @@ export function LeadCreateForm() {
           segment: keepSegment,
           source: keepSource,
           status: keepStatus,
+          deal_type: keepDealType,
+          priority: keepPriority,
           hook_text: "",
           notes: "",
         });
@@ -394,6 +406,38 @@ export function LeadCreateForm() {
               </div>
             </div>
           ) : null}
+        </div>
+        <div>
+          <label className={labelCls}>Тип сделки</label>
+          <select
+            value={form.deal_type}
+            onChange={(e) =>
+              update("deal_type", e.target.value as (typeof DEAL_TYPES)[number])
+            }
+            className={inputCls}
+          >
+            {DEAL_TYPES.map((d) => (
+              <option key={d} value={d}>
+                {DEAL_TYPE_LABELS_RU[d]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Приоритет</label>
+          <select
+            value={form.priority}
+            onChange={(e) =>
+              update("priority", e.target.value as (typeof PRIORITIES)[number])
+            }
+            className={inputCls}
+          >
+            {PRIORITIES.map((p) => (
+              <option key={p} value={p}>
+                {PRIORITY_LABELS_RU[p]}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <label className={labelCls}>Источник</label>

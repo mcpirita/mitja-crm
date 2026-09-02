@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { LeadStatus, Segment, Source } from "./enums";
+import { DealType, LeadStatus, Priority, Segment, Source } from "./enums";
 
 const optionalTrimmed = z
   .string()
@@ -18,6 +18,8 @@ export const LeadCreate = z.object({
   segment: Segment,
   source: Source.default("other"),
   status: LeadStatus.default("new"),
+  deal_type: DealType.default("rent"),
+  priority: Priority.default("medium"),
   hook_text: optionalTrimmed,
   notes: optionalTrimmed,
 });
@@ -35,6 +37,8 @@ export const LeadRow = z.object({
   segment: Segment,
   source: Source,
   status: LeadStatus,
+  deal_type: DealType,
+  priority: Priority,
   hook_text: z.string().nullable(),
   notes: z.string().nullable(),
   last_status_raw: z.string().nullable(),

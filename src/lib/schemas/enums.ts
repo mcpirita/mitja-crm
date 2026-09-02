@@ -51,6 +51,12 @@ export const SEGMENT_WITH_ANY = [...SEGMENTS, "any"] as const;
 
 export const SOURCES = ["linkedin", "google", "catalog", "referral", "other"] as const;
 
+// Тип сделки: аренда помещений vs продажа здания целиком.
+export const DEAL_TYPES = ["rent", "sale"] as const;
+
+// Приоритет проработки лида (из Käuferliste: Высокий / Средний / Низкий).
+export const PRIORITIES = ["high", "medium", "low"] as const;
+
 export const LEAD_STATUSES = [
   "new",
   "contacted",
@@ -85,6 +91,8 @@ export const TEMPLATE_LANGUAGES = ["ru", "de", "en"] as const;
 export const Segment = z.string().trim().min(1).max(50);
 export const SegmentWithAny = z.string().trim().min(1).max(50);
 export const Source = z.enum(SOURCES);
+export const DealType = z.enum(DEAL_TYPES);
+export const Priority = z.enum(PRIORITIES);
 export const LeadStatus = z.enum(LEAD_STATUSES);
 export const EventType = z.enum(EVENT_TYPES);
 export const TemplateKind = z.enum(TEMPLATE_KINDS);
@@ -93,6 +101,8 @@ export const TemplateLanguage = z.enum(TEMPLATE_LANGUAGES);
 export type Segment = z.infer<typeof Segment>;
 export type SegmentWithAny = z.infer<typeof SegmentWithAny>;
 export type Source = z.infer<typeof Source>;
+export type DealType = z.infer<typeof DealType>;
+export type Priority = z.infer<typeof Priority>;
 export type LeadStatus = z.infer<typeof LeadStatus>;
 export type EventType = z.infer<typeof EventType>;
 export type TemplateKind = z.infer<typeof TemplateKind>;
@@ -121,6 +131,24 @@ export const SEGMENT_LABELS_RU: Record<Segment, string> = {
   immersive: "Иммерсивные выставки",
   crossfit: "Кроссфит",
   other: "Прочее",
+};
+
+export const DEAL_TYPE_LABELS_RU: Record<DealType, string> = {
+  rent: "Аренда помещения",
+  sale: "Продажа здания",
+};
+
+export const PRIORITY_LABELS_RU: Record<Priority, string> = {
+  high: "Высокий",
+  medium: "Средний",
+  low: "Низкий",
+};
+
+// Чем меньше число, тем выше лид в очереди «Сегодня».
+export const PRIORITY_ORDER: Record<Priority, number> = {
+  high: 0,
+  medium: 1,
+  low: 2,
 };
 
 export const LEAD_STATUS_LABELS_RU: Record<LeadStatus, string> = {

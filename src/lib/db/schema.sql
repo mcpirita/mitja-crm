@@ -30,6 +30,12 @@ CREATE TABLE IF NOT EXISTS leads (
         'lost',
         'dead'
     )),
+    -- Тип сделки. Аренда помещений и продажа здания целиком — два разных
+    -- пайплайна с разной аудиторией: арендаторам шлём экспозе по залам,
+    -- покупателям — тизер на здание. Дефолт 'rent' — исторический пайплайн.
+    deal_type TEXT NOT NULL DEFAULT 'rent' CHECK (deal_type IN ('rent', 'sale')),
+    -- Приоритет проработки. Ведётся руками, сортирует очередь в «Сегодня».
+    priority TEXT NOT NULL DEFAULT 'medium' CHECK (priority IN ('high', 'medium', 'low')),
     hook_text TEXT,
     notes TEXT,
     last_status_raw TEXT,
@@ -39,6 +45,7 @@ CREATE TABLE IF NOT EXISTS leads (
 );
 
 CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status);
+CREATE INDEX IF NOT EXISTS idx_leads_deal_type ON leads(deal_type);
 CREATE INDEX IF NOT EXISTS idx_leads_segment ON leads(segment);
 CREATE INDEX IF NOT EXISTS idx_leads_next_action_due ON leads(next_action_due);
 
@@ -152,6 +159,26 @@ INSERT OR IGNORE INTO segments (slug, label_ru, color, sort_order) VALUES
     ('immersive',    'Иммерсивные выставки', 'violet',  200),
     ('crossfit',     'Кроссфит',             'red',     210),
     ('other',        'Прочее',               'zinc',    999);
+
+-- Сегменты пайплайна продажи здания (deal_type = 'sale'), заведены из
+-- Lumiera_Kaeuferliste_1.xlsx 2026-09-01. sort_order с 300, чтобы в списках
+-- шли после арендных сегментов.
+INSERT OR IGNORE INTO segments (slug, label_ru, color, sort_order) VALUES
+    ('investor_valueadd',     'Инвесторы: value-add',   'amber',   300),
+    ('investor_family_office','Family office',          'yellow',  310),
+    ('fund_asset_manager',    'Фонды / Asset Manager',  'blue',    320),
+    ('broker',                'Маклеры / брокеры',      'sky',     330),
+    ('parking_investor',      'Паркинг-инвесторы',      'stone',   340),
+    ('foreign_capital',       'Иностранный капитал',    'violet',  350),
+    ('self_storage',          'Self-storage',           'teal',    360),
+    ('fitness_chain',         'Фитнес-сети',            'lime',    370),
+    ('education',             'Образование',            'indigo',  380),
+    ('medical_mvz',           'Медицина / MVZ',         'emerald', 390),
+    ('cinema_buyer',          'Кинооператоры (покупка)','purple',  400),
+    ('cinema_precedent',      'Прецеденты: кинообъекты','fuchsia', 410),
+    ('hotel',                 'Отели',                  'rose',    420),
+    ('local_city',            'Местные / город',        'orange',  430),
+    ('platforms',             'Платформы и базы',       'cyan',    440);
 
 -- Одиночная строка id=1.
 CREATE TABLE IF NOT EXISTS settings (

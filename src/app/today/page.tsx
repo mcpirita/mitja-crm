@@ -5,10 +5,13 @@ import { ActiveLeadsTable } from "@/components/today/ActiveLeadsTable";
 import { getDb } from "@/lib/db/getDb";
 import { listSegments } from "@/lib/db/segments";
 import { getNextAction } from "@/lib/pipeline/getNextAction";
+import { PRIORITY_ORDER } from "@/lib/schemas";
 import type {
+  DealType,
   LeadRow,
   OutreachEventRow,
   LeadStatus,
+  Priority,
   Segment,
   EventType,
 } from "@/lib/schemas";
@@ -31,6 +34,8 @@ function rowToLead(row: Record<string, unknown>): LeadRow {
     segment: row.segment as Segment,
     source: row.source as LeadRow["source"],
     status: row.status as LeadStatus,
+    deal_type: (row.deal_type as DealType) ?? "rent",
+    priority: (row.priority as Priority) ?? "medium",
     hook_text: (row.hook_text as string | null) ?? null,
     notes: (row.notes as string | null) ?? null,
     last_status_raw: (row.last_status_raw as string | null) ?? null,
@@ -99,16 +104,21 @@ export default async function TodayPage() {
     else if (next_action.urgency === "soon") soon.push(item);
   }
 
+  // Сначала по сроку, затем по приоритету: внутри одного дня (а «Написать
+  // первое» валится на сегодня целой пачкой) вверху должен быть «Высокий».
   const sortAsc = (
     a: (typeof overdue)[number],
     b: (typeof overdue)[number]
   ) => {
     const ad = a.next_action.due_date;
     const bd = b.next_action.due_date;
-    if (ad === null && bd === null) return 0;
-    if (ad === null) return 1;
-    if (bd === null) return -1;
-    return ad.localeCompare(bd);
+    if (ad !== bd) {
+      if (ad === null) return 1;
+      if (bd === null) return -1;
+      const byDate = ad.localeCompare(bd);
+      if (byDate !== 0) return byDate;
+    }
+    return PRIORITY_ORDER[a.lead.priority] - PRIORITY_ORDER[b.lead.priority];
   };
   overdue.sort(sortAsc);
   todayList.sort(sortAsc);

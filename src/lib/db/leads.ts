@@ -1,9 +1,11 @@
 import { getDb } from "./getDb";
 import type {
+  DealType,
   LeadCreate,
   LeadRow,
   LeadUpdate,
   LeadStatus,
+  Priority,
   Segment,
 } from "@/lib/schemas";
 
@@ -21,6 +23,8 @@ function rowToLead(row: Record<string, unknown>): LeadRow {
     segment: row.segment as Segment,
     source: row.source as LeadRow["source"],
     status: row.status as LeadStatus,
+    deal_type: (row.deal_type as DealType) ?? "rent",
+    priority: (row.priority as Priority) ?? "medium",
     hook_text: (row.hook_text as string | null) ?? null,
     notes: (row.notes as string | null) ?? null,
     last_status_raw: (row.last_status_raw as string | null) ?? null,
@@ -33,6 +37,7 @@ function rowToLead(row: Record<string, unknown>): LeadRow {
 export interface ListLeadsFilters {
   segment?: Segment;
   status?: LeadStatus;
+  deal_type?: DealType;
   q?: string;
 }
 
@@ -47,6 +52,10 @@ export async function listLeads(filters: ListLeadsFilters = {}): Promise<LeadRow
   if (filters.status) {
     where.push("status = ?");
     args.push(filters.status);
+  }
+  if (filters.deal_type) {
+    where.push("deal_type = ?");
+    args.push(filters.deal_type);
   }
   if (filters.q && filters.q.trim().length > 0) {
     where.push("(name LIKE ? OR company LIKE ?)");
@@ -76,8 +85,9 @@ export async function createLead(input: LeadCreate): Promise<LeadRow> {
   const db = getDb();
   const result = await db.execute({
     sql: `INSERT INTO leads
-      (name, company, email, website, country, city, segment, source, status, hook_text, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (name, company, email, website, country, city, segment, source, status,
+       deal_type, priority, hook_text, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       RETURNING *`,
     args: [
       input.name ?? "",
@@ -89,6 +99,8 @@ export async function createLead(input: LeadCreate): Promise<LeadRow> {
       input.segment,
       input.source,
       input.status,
+      input.deal_type,
+      input.priority,
       input.hook_text ?? null,
       input.notes ?? null,
     ],
@@ -117,6 +129,8 @@ export async function updateLead(id: number, patch: LeadUpdate): Promise<LeadRow
   if (patch.segment !== undefined) set("segment", patch.segment);
   if (patch.source !== undefined) set("source", patch.source);
   if (patch.status !== undefined) set("status", patch.status);
+  if (patch.deal_type !== undefined) set("deal_type", patch.deal_type);
+  if (patch.priority !== undefined) set("priority", patch.priority);
   if (patch.hook_text !== undefined) set("hook_text", patch.hook_text ?? null);
   if (patch.notes !== undefined) set("notes", patch.notes ?? null);
 

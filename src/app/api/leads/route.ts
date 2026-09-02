@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
+  DealType,
   LeadCreate,
   LeadStatus,
   Segment,
@@ -11,18 +12,24 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const segmentRaw = url.searchParams.get("segment");
   const statusRaw = url.searchParams.get("status");
+  const dealTypeRaw = url.searchParams.get("deal_type");
   const q = url.searchParams.get("q") ?? undefined;
 
   const segmentParsed = segmentRaw ? Segment.safeParse(segmentRaw) : null;
   const statusParsed = statusRaw ? LeadStatus.safeParse(statusRaw) : null;
+  const dealTypeParsed = dealTypeRaw ? DealType.safeParse(dealTypeRaw) : null;
 
   if (statusRaw && statusParsed && !statusParsed.success) {
     return NextResponse.json({ error: "Некорректный status" }, { status: 400 });
+  }
+  if (dealTypeRaw && dealTypeParsed && !dealTypeParsed.success) {
+    return NextResponse.json({ error: "Некорректный deal_type" }, { status: 400 });
   }
 
   const leads = await listLeads({
     segment: segmentParsed?.success ? segmentParsed.data : undefined,
     status: statusParsed?.success ? statusParsed.data : undefined,
+    deal_type: dealTypeParsed?.success ? dealTypeParsed.data : undefined,
     q,
   });
 

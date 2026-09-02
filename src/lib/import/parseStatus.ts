@@ -106,28 +106,38 @@ function pad(n: number): string {
   return String(n).padStart(2, "0");
 }
 
-export function parseDateToken(token: string, refYear: number): string | null {
+/**
+ * refIso — дата импорта (YYYY-MM-DD). Токен без года («27.10») относится к
+ * прошлому: это запись о том, что уже отправлено. Если с годом импорта дата
+ * оказывается в будущем — значит, имелся в виду предыдущий год.
+ * Без этого «27.10» при импорте 2026-05-25 давало 2026-10-27 (пять месяцев
+ * вперёд) вместо 2025-10-27 и ломало всю логику «кому пора написать».
+ */
+export function parseDateToken(token: string, refIso: string): string | null {
   const m = token.match(/^(\d{1,2})\.(\d{1,2})(?:\.(\d{2,4}))?$/);
   if (!m) return null;
   const day = Number(m[1]);
   const month = Number(m[2]);
-  let year: number;
+  if (day < 1 || day > 31 || month < 1 || month > 12) return null;
+
   if (m[3]) {
     const raw = Number(m[3]);
-    year = raw < 100 ? 2000 + raw : raw;
-  } else {
-    year = refYear;
+    const year = raw < 100 ? 2000 + raw : raw;
+    return `${year}-${pad(month)}-${pad(day)}`;
   }
-  if (day < 1 || day > 31 || month < 1 || month > 12) return null;
-  return `${year}-${pad(month)}-${pad(day)}`;
+
+  const refYear = Number(refIso.slice(0, 4));
+  const candidate = `${refYear}-${pad(month)}-${pad(day)}`;
+  if (candidate > refIso) return `${refYear - 1}-${pad(month)}-${pad(day)}`;
+  return candidate;
 }
 
-function extractDates(text: string, refYear: number): DateToken[] {
+function extractDates(text: string, refIso: string): DateToken[] {
   const re = /\b(\d{1,2}\.\d{1,2}(?:\.\d{2,4})?)\b/g;
   const out: DateToken[] = [];
   let m: RegExpExecArray | null;
   while ((m = re.exec(text)) !== null) {
-    const iso = parseDateToken(m[1], refYear);
+    const iso = parseDateToken(m[1], refIso);
     if (iso) out.push({ iso, pos: m.index });
   }
   return out;
@@ -278,11 +288,10 @@ function startsWithStandaloneNo(lower: string): boolean {
 
 export function parseStatus(rawInput: string, referenceDate: Date): ParsedStatus {
   const raw = rawInput.trim();
-  const refYear = referenceDate.getUTCFullYear();
   const refIso = referenceDate.toISOString().slice(0, 10);
   const lower = raw.toLowerCase();
 
-  const dates = extractDates(raw, refYear);
+  const dates = extractDates(raw, refIso);
   const markers = extractMarkers(raw);
   const { events, unparsed } = assignDates(markers, dates, refIso);
   const detected: string[] = markers.map((m) =>

@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db/getDb";
 import { getNextAction, type NextAction } from "@/lib/pipeline/getNextAction";
 import type {
+  DealType,
   LeadRow,
   OutreachEventRow,
   LeadStatus,
+  Priority,
   Segment,
   EventType,
 } from "@/lib/schemas";
@@ -23,6 +25,8 @@ function rowToLead(row: Record<string, unknown>): LeadRow {
     segment: row.segment as Segment,
     source: row.source as LeadRow["source"],
     status: row.status as LeadStatus,
+    deal_type: (row.deal_type as DealType) ?? "rent",
+    priority: (row.priority as Priority) ?? "medium",
     hook_text: (row.hook_text as string | null) ?? null,
     notes: (row.notes as string | null) ?? null,
     last_status_raw: (row.last_status_raw as string | null) ?? null,

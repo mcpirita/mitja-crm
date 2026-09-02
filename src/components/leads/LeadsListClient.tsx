@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { LeadRow as LeadRowType, SegmentRow } from "@/lib/schemas";
-import { LEAD_STATUSES, LEAD_STATUS_LABELS_RU } from "@/lib/schemas";
+import {
+  DEAL_TYPES,
+  DEAL_TYPE_LABELS_RU,
+  LEAD_STATUSES,
+  LEAD_STATUS_LABELS_RU,
+} from "@/lib/schemas";
 import { LeadRow } from "./LeadRow";
 import { EmptyState } from "@/components/EmptyState";
 
@@ -12,6 +17,7 @@ export function LeadsListClient({ segments }: { segments: SegmentRow[] }) {
   const [error, setError] = useState<string | null>(null);
   const [segment, setSegment] = useState<string>("");
   const [status, setStatus] = useState<string>("");
+  const [dealType, setDealType] = useState<string>("");
   const [query, setQuery] = useState<string>("");
   const [debouncedQuery, setDebouncedQuery] = useState<string>("");
 
@@ -24,10 +30,11 @@ export function LeadsListClient({ segments }: { segments: SegmentRow[] }) {
     const params = new URLSearchParams();
     if (segment) params.set("segment", segment);
     if (status) params.set("status", status);
+    if (dealType) params.set("deal_type", dealType);
     if (debouncedQuery.trim()) params.set("q", debouncedQuery.trim());
     const s = params.toString();
     return s ? "?" + s : "";
-  }, [segment, status, debouncedQuery]);
+  }, [segment, status, dealType, debouncedQuery]);
 
   useEffect(() => {
     let cancelled = false;
@@ -65,6 +72,21 @@ export function LeadsListClient({ segments }: { segments: SegmentRow[] }) {
           />
         </div>
         <div>
+          <label className="block text-xs text-zinc-600 mb-1">Тип сделки</label>
+          <select
+            value={dealType}
+            onChange={(e) => setDealType(e.target.value)}
+            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm bg-white"
+          >
+            <option value="">Все</option>
+            {DEAL_TYPES.map((d) => (
+              <option key={d} value={d}>
+                {DEAL_TYPE_LABELS_RU[d]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
           <label className="block text-xs text-zinc-600 mb-1">Сегмент</label>
           <select
             value={segment}
@@ -94,12 +116,13 @@ export function LeadsListClient({ segments }: { segments: SegmentRow[] }) {
             ))}
           </select>
         </div>
-        {(segment || status || query) && (
+        {(segment || status || dealType || query) && (
           <button
             type="button"
             onClick={() => {
               setSegment("");
               setStatus("");
+              setDealType("");
               setQuery("");
             }}
             className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100"
@@ -138,6 +161,7 @@ export function LeadsListClient({ segments }: { segments: SegmentRow[] }) {
                 <th className="px-3 py-2 font-medium">Компания</th>
                 <th className="px-3 py-2 font-medium">Сегмент</th>
                 <th className="px-3 py-2 font-medium">Статус</th>
+                <th className="px-3 py-2 font-medium">Приоритет</th>
                 <th className="px-3 py-2 font-medium">Обновлён</th>
                 <th className="px-3 py-2" />
               </tr>

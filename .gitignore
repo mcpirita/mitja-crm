@@ -48,5 +48,17 @@ local.db-shm
 local.db-wal
 
 # данные клиентов и лидов — не коммитить (персональные данные)
+# /data покрывает и выгрузку почты data/mail
 /data
 *.csv
+*.xlsx
+
+# macOS AppleDouble junk (внешний диск)
+._*
+.DS_Store
+
+# бэкапы прод-базы
+/backups
+
+# токен Microsoft Graph
+.graph-token.json

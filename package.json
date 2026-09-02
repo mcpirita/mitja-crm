@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "migrate": "tsx scripts/migrate.ts"
+    "migrate": "tsx scripts/migrate.ts",
+    "mail:sync": "tsx scripts/graph-mail.ts",
+    "enrich:notes": "tsx scripts/enrich-notes.ts",
+    "import:mail": "tsx scripts/import-from-mail.ts",
+    "mail:decisions": "tsx scripts/apply-mail-decisions.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.98.0",
